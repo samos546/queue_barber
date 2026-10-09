@@ -1114,6 +1114,7 @@
                         type="button">
                         AR
                     </button>
+                    <button id="lang-en" class="lang-btn" type="button">EN</button>
 
                 </div>
 
@@ -1634,6 +1635,18 @@
 
             },
 
+            en: {
+                systemLive: "SYSTEM LIVE",
+                queue: "WAITING QUEUE",
+                serving: "CUSTOMERS BEING SERVED",
+                queueSystem: "DIGITAL QUEUE SYSTEM",
+                available: "AVAILABLE",
+                live: "LIVE",
+                free: "Available",
+                noCustomer: "No customer",
+                inService: "IN SERVICE"
+            },
+
             ar: {
 
                 systemLive:
@@ -1669,7 +1682,7 @@
 
 
         let currentLanguage =
-            localStorage.getItem("tv-language") || "fr";
+            localStorage.getItem("bq-ui-language") || localStorage.getItem("tv-language") || "fr";
 
 
         function setLanguage(lang) {
@@ -1717,16 +1730,14 @@
 
             document
                 .getElementById("lang-ar")
-                .classList.toggle(
-                    "active",
-                    lang === "ar"
-                );
+                .classList.toggle("active", lang === "ar");
+            const enButton=document.getElementById("lang-en");
+            if(enButton)enButton.classList.toggle("active",lang === "en");
+            if(window.bqSetLanguage)window.bqSetLanguage(lang);
 
 
-            localStorage.setItem(
-                "tv-language",
-                lang
-            );
+            localStorage.setItem("tv-language", lang);
+            localStorage.setItem("bq-ui-language", lang);
 
         }
 
@@ -1741,10 +1752,8 @@
 
         document
             .getElementById("lang-ar")
-            .addEventListener(
-                "click",
-                () => setLanguage("ar")
-            );
+            .addEventListener("click", () => setLanguage("ar"));
+        document.getElementById("lang-en").addEventListener("click",()=>setLanguage("en"));
 
 
         setLanguage(currentLanguage);
@@ -1753,6 +1762,142 @@
 setInterval(loadTV,5000);
 </script>
 
+<script>
+(function(){
+ const dict={
+  'Gestion en temps réel.':{ar:'إدارة مباشرة.',fr:'Gestion en temps réel.',en:'Real-time management.'},
+  'TERMINER LE RENDEZ-VOUS':{ar:'إنهاء الموعد',fr:'TERMINER LE RENDEZ-VOUS',en:'FINISH APPOINTMENT'},
+  'APPELER LE SUIVANT':{ar:'استدعاء التالي',fr:'APPELER LE SUIVANT',en:'CALL NEXT'},
+  'APPELER RENDEZ-VOUS':{ar:'استدعاء الموعد',fr:'APPELER RENDEZ-VOUS',en:'CALL APPOINTMENT'},
+  'Terminer le client':{ar:'إنهاء خدمة الزبون',fr:'Terminer le client',en:'Finish customer'},
+  'RENDEZ-VOUS CONFIRMÉS':{ar:'المواعيد المؤكدة',fr:'RENDEZ-VOUS CONFIRMÉS',en:'CONFIRMED APPOINTMENTS'},
+  'Consultez les clients, les recettes estimées et gérez les tarifs, catégories et postes.':{ar:'تابع الزبائن والمداخيل التقديرية وأدر الأسعار والخدمات ومحطات الحلاقة.',fr:'Consultez les clients, les recettes estimées et gérez les tarifs, catégories et postes.',en:'View customers and estimated revenue, and manage prices, services and barber stations.'},
+  'Connexion sécurisée via Supabase Auth. Créez d’abord un utilisateur administrateur dans Supabase → Authentication → Users.':{ar:'اتصال آمن عبر Supabase Auth. أنشئ أولًا مستخدم إدارة من Supabase → Authentication → Users.',fr:'Connexion sécurisée via Supabase Auth. Créez d’abord un utilisateur administrateur dans Supabase → Authentication → Users.',en:'Secure sign-in via Supabase Auth. First create an admin user in Supabase → Authentication → Users.'},
+  'Email administrateur Supabase':{ar:'البريد الإلكتروني للإدارة',fr:'Email administrateur Supabase',en:'Supabase admin email'},
+  'Mot de passe Supabase':{ar:'كلمة مرور Supabase',fr:'Mot de passe Supabase',en:'Supabase password'},
+  'CHIFFRE D’AFFAIRES':{ar:'رقم الأعمال',fr:'CHIFFRE D’AFFAIRES',en:'REVENUE'},
+  'DÉPENSES ENREGISTRÉES':{ar:'المصاريف المسجلة',fr:'DÉPENSES ENREGISTRÉES',en:'RECORDED EXPENSES'},
+  'BÉNÉFICE NET ESTIMÉ':{ar:'صافي الربح التقديري',fr:'BÉNÉFICE NET ESTIMÉ',en:'ESTIMATED NET PROFIT'},
+  'PANIER MOYEN':{ar:'متوسط الفاتورة',fr:'PANIER MOYEN',en:'AVERAGE BILL'},
+  'Prestations terminées':{ar:'الخدمات المكتملة',fr:'Prestations terminées',en:'Completed services'},
+  'Charges saisies':{ar:'المصاريف المدخلة',fr:'Charges saisies',en:'Expenses entered'},
+  'Recettes − dépenses':{ar:'المداخيل − المصاريف',fr:'Recettes − dépenses',en:'Revenue − expenses'},
+  'Par prestation terminée':{ar:'لكل خدمة مكتملة',fr:'Par prestation terminée',en:'Per completed service'},
+  'CLIENTS REÇUS':{ar:'الزبائن المستقبَلون',fr:'CLIENTS REÇUS',en:'CUSTOMERS RECEIVED'},
+  'PRESTATIONS TERMINÉES':{ar:'الخدمات المكتملة',fr:'PRESTATIONS TERMINÉES',en:'COMPLETED SERVICES'},
+  'RECETTES ESTIMÉES':{ar:'المداخيل التقديرية',fr:'RECETTES ESTIMÉES',en:'ESTIMATED REVENUE'},
+  'Dinars algériens':{ar:'دينار جزائري',fr:'Dinars algériens',en:'Algerian dinars'},
+  'Analyse des recettes':{ar:'تحليل المداخيل',fr:'Analyse des recettes',en:'Revenue analysis'},
+  'Recettes estimées des 7 derniers jours pour les tickets terminés.':{ar:'المداخيل التقديرية لآخر 7 أيام للتذاكر المكتملة.',fr:'Recettes estimées des 7 derniers jours pour les tickets terminés.',en:'Estimated revenue from completed tickets over the last 7 days.'},
+  'Calcul indicatif : le tarif actuel est appliqué aux tickets terminés. Pour des comptes exacts, il faut enregistrer le prix appliqué à chaque ticket.':{ar:'حساب تقريبي: يُطبّق السعر الحالي على التذاكر المكتملة. للدقة، سجّل السعر الفعلي لكل تذكرة.',fr:'Calcul indicatif : le tarif actuel est appliqué aux tickets terminés. Pour des comptes exacts, il faut enregistrer le prix appliqué à chaque ticket.',en:'Estimate: current prices are applied to completed tickets. For accuracy, save the actual price for each ticket.'},
+  'Performance par prestation':{ar:'أداء الخدمات',fr:'Performance par prestation',en:'Service performance'},
+  'Classement selon les prestations terminées et leur chiffre d’affaires.':{ar:'ترتيب الخدمات حسب عدد الخدمات المكتملة والمداخيل.',fr:'Classement selon les prestations terminées et leur chiffre d’affaires.',en:'Ranking by completed services and revenue.'},
+  'Activité récente':{ar:'النشاط الأخير',fr:'Activité récente',en:'Recent activity'},
+  'Derniers tickets depuis Supabase.':{ar:'آخر التذاكر من Supabase.',fr:'Derniers tickets depuis Supabase.',en:'Latest tickets from Supabase.'},
+  'Dépenses & charges':{ar:'المصاريف والتكاليف',fr:'Dépenses & charges',en:'Expenses & costs'},
+  'Ajoutez loyer, produits, matériel, salaires ou autres charges pour estimer le bénéfice net. Ces entrées sont partagées dans Supabase.':{ar:'أضف الإيجار والمنتجات والمعدات والرواتب أو غيرها لتقدير صافي الربح. تُحفظ البيانات في Supabase.',fr:'Ajoutez loyer, produits, matériel, salaires ou autres charges pour estimer le bénéfice net. Ces entrées sont partagées dans Supabase.',en:'Add rent, products, equipment, salaries or other costs to estimate net profit. Entries are shared in Supabase.'},
+  'Ex. Produits de coiffure':{ar:'مثال: منتجات الحلاقة',fr:'Ex. Produits de coiffure',en:'e.g. Barber products'},
+  'Montant DA':{ar:'المبلغ بالدينار',fr:'Montant DA',en:'Amount (DA)'},
+  '+ AJOUTER':{ar:'+ إضافة',fr:'+ AJOUTER',en:'+ ADD'},
+  'Dépense':{ar:'المصروف',fr:'Dépense',en:'Expense'},
+  'Catégorie':{ar:'الفئة',fr:'Catégorie',en:'Category'},
+  'Montant':{ar:'المبلغ',fr:'Montant',en:'Amount'},
+  'Tarifs des prestations':{ar:'أسعار الخدمات',fr:'Tarifs des prestations',en:'Service prices'},
+  'Prix en dinars algériens (DA).':{ar:'الأسعار بالدينار الجزائري (DA).',fr:'Prix en dinars algériens (DA).',en:'Prices in Algerian dinars (DA).'},
+  'Ex. Broshing':{ar:'مثال: بروشينغ',fr:'Ex. Broshing',en:'e.g. Blow-dry'},
+  'Prix DA':{ar:'السعر بالدينار',fr:'Prix DA',en:'Price (DA)'},
+  'Catégories':{ar:'الخدمات',fr:'Catégories',en:'Services'},
+  'Postes / fauteuils':{ar:'محطات / كراسي الحلاقة',fr:'Postes / fauteuils',en:'Barber stations / chairs'},
+  'Sécurité du dashboard':{ar:'أمان لوحة الإدارة',fr:'Sécurité du dashboard',en:'Dashboard security'},
+  'CHANGER LE MOT DE PASSE':{ar:'تغيير كلمة المرور',fr:'CHANGER LE MOT DE PASSE',en:'CHANGE PASSWORD'},
+  'Rendez-vous demandés':{ar:'المواعيد المطلوبة',fr:'Rendez-vous demandés',en:'Requested appointments'},
+  'Équipe / Barbiers':{ar:'الفريق / الحلاقون',fr:'Équipe / Barbiers',en:'Team / Barbers'},
+  'Fidélité clients':{ar:'ولاء الزبائن',fr:'Fidélité clients',en:'Customer loyalty'},
+  'Téléphone':{ar:'الهاتف',fr:'Téléphone',en:'Phone'},
+  'Visites':{ar:'الزيارات',fr:'Visites',en:'Visits'},
+  'Points':{ar:'النقاط',fr:'Points',en:'Points'},
+  'Dernière visite':{ar:'آخر زيارة',fr:'Dernière visite',en:'Last visit'},
+  'Profil du salon':{ar:'ملف الصالون',fr:'Profil du salon',en:'Salon profile'},
+  'ENREGISTRER':{ar:'حفظ',fr:'ENREGISTRER',en:'SAVE'},
+  'QR Code sécurisé du salon':{ar:'رمز QR آمن للصالون',fr:'QR Code sécurisé du salon',en:'Secure salon QR code'},
+  'DURÉE DE VALIDITÉ':{ar:'مدة الصلاحية',fr:'DURÉE DE VALIDITÉ',en:'VALIDITY PERIOD'},
+  'TÉLÉCHARGER PNG':{ar:'تحميل PNG',fr:'TÉLÉCHARGER PNG',en:'DOWNLOAD PNG'},
+  'COPIER LE LIEN':{ar:'نسخ الرابط',fr:'COPIER LE LIEN',en:'COPY LINK'},
+  'Nom du salon':{ar:'اسم الصالون',fr:'Nom du salon',en:'Salon name'},
+  'Choisissez votre service':{ar:'اختر خدمتك',fr:'Choisissez votre service',en:'Choose your service'},
+  'Carte fidélité (facultatif)':{ar:'بطاقة الولاء (اختياري)',fr:'Carte fidélité (facultatif)',en:'Loyalty card (optional)'},
+  'Coupe':{ar:'حلاقة الشعر',fr:'Coupe',en:'Haircut'},
+  'Barbe':{ar:'اللحية',fr:'Barbe',en:'Beard trim'},
+  'Coupe + Barbe':{ar:'الشعر + اللحية',fr:'Coupe + Barbe',en:'Haircut + Beard'},
+  'Coupe de cheveux →':{ar:'حلاقة الشعر ←',fr:'Coupe de cheveux →',en:'Haircut →'},
+  'Taille et finition →':{ar:'تشذيب وتشطيب ←',fr:'Taille et finition →',en:'Trim and finish →'},
+  'Service complet →':{ar:'خدمة كاملة ←',fr:'Service complet →',en:'Full service →'},
+  'Prendre un ticket':{ar:'أخذ تذكرة',fr:'Prendre un ticket',en:'Get a ticket'},
+  'Prendre rendez-vous':{ar:'حجز موعد',fr:'Prendre rendez-vous',en:'Book an appointment'},
+  'BARBER QUEUE / BUSINESS INTELLIGENCE':{ar:'BARBER QUEUE / ذكاء الأعمال',fr:'BARBER QUEUE / BUSINESS INTELLIGENCE',en:'BARBER QUEUE / BUSINESS INTELLIGENCE'},
+  'Retour / Back':{ar:'رجوع',fr:'Retour',en:'Back'},
+  '← Retour / Back':{ar:'رجوع ←',fr:'← Retour',en:'← Back'},
+  'Retour à l’accueil':{ar:'العودة للرئيسية',fr:'Retour à l’accueil',en:'Back to home'},
+  'Prendre un ticket':{ar:'أخذ تذكرة',fr:'Prendre un ticket',en:'Get a ticket'},
+  'Prendre rendez-vous':{ar:'حجز موعد',fr:'Prendre rendez-vous',en:'Book an appointment'},
+  'Prendre un autre ticket':{ar:'أخذ تذكرة أخرى',fr:'Prendre un autre ticket',en:'Get another ticket'},
+  'Choisissez une prestation pour prendre votre ticket.':{ar:'اختر الخدمة للحصول على تذكرتك.',fr:'Choisissez une prestation pour prendre votre ticket.',en:'Choose a service to get your ticket.'},
+  'Choisir une option':{ar:'اختر خيارًا',fr:'Choisir une option',en:'Choose an option'},
+  'Réserver un créneau':{ar:'احجز موعدًا',fr:'Réserver un créneau',en:'Book a time slot'},
+  'Nom / الاسم':{ar:'الاسم',fr:'Nom / الاسم',en:'Name'},
+  'Téléphone / الهاتف':{ar:'الهاتف',fr:'Téléphone / الهاتف',en:'Phone'},
+  'Choisir un service':{ar:'اختر الخدمة',fr:'Choisir un service',en:'Choose a service'},
+  "N'importe quel coiffeur":{ar:'أي حلاق',fr:"N'importe quel coiffeur",en:'Any barber'},
+  'DEMANDER UN RENDEZ-VOUS ↗':{ar:'طلب موعد ↗',fr:'DEMANDER UN RENDEZ-VOUS ↗',en:'REQUEST APPOINTMENT ↗'},
+  'LIVE QUEUE / FILE EN DIRECT':{ar:'الطابور المباشر',fr:'LIVE QUEUE / FILE EN DIRECT',en:'LIVE QUEUE'},
+  'Votre attente en temps réel':{ar:'انتظارك في الوقت الفعلي',fr:'Votre attente en temps réel',en:'Your live wait'},
+  'Les chiffres se mettent à jour automatiquement.':{ar:'يتم تحديث الأرقام تلقائيًا.',fr:'Les chiffres se mettent à jour automatiquement.',en:'Numbers update automatically.'},
+  'Ticket en service':{ar:'التذكرة الحالية',fr:'Ticket en service',en:'Now serving'},
+  'En attente':{ar:'في الانتظار',fr:'En attente',en:'Waiting'},
+  'Attente estimée':{ar:'الانتظار المتوقع',fr:'Attente estimée',en:'Estimated wait'},
+  'BUSINESS INTELLIGENCE / ADMIN':{ar:'ذكاء الأعمال / الإدارة',fr:'BUSINESS INTELLIGENCE / ADMIN',en:'BUSINESS INTELLIGENCE / ADMIN'},
+  '← Retour / Back':{ar:'رجوع ←',fr:'← Retour',en:'← Back'},
+  '↻ ACTUALISER':{ar:'↻ تحديث',fr:'↻ ACTUALISER',en:'↻ REFRESH'},
+  'RÉINITIALISER LES DONNÉES':{ar:'إعادة ضبط البيانات',fr:'RÉINITIALISER LES DONNÉES',en:'RESET DATA'},
+  'VERROUILLER':{ar:'قفل',fr:'VERROUILLER',en:'LOCK'},
+  'ESPACE PRIVÉ':{ar:'مساحة خاصة',fr:'ESPACE PRIVÉ',en:'PRIVATE AREA'},
+  'Business dashboard.':{ar:'لوحة إدارة الأعمال',fr:'Business dashboard.',en:'Business dashboard.'},
+  'DÉVERROUILLER ↗':{ar:'فتح ↗',fr:'DÉVERROUILLER ↗',en:'UNLOCK ↗'},
+  'SYSTÈME EN DIRECT':{ar:'النظام مباشر',fr:'SYSTÈME EN DIRECT',en:'SYSTEM LIVE'},
+  'DIGITAL QUEUE SYSTEM':{ar:'نظام الطابور الرقمي',fr:'DIGITAL QUEUE SYSTEM',en:'DIGITAL QUEUE SYSTEM'},
+  'SERVICES':{ar:'الخدمات',fr:'SERVICES',en:'SERVICES'},
+  'Aucun client fidélité.':{ar:'لا يوجد زبائن في برنامج الولاء.',fr:'Aucun client fidélité.',en:'No loyalty customers yet.'},
+  'Aucun rendez-vous.':{ar:'لا توجد مواعيد.',fr:'Aucun rendez-vous.',en:'No appointments.'},
+  'Aucun ticket.':{ar:'لا توجد تذاكر.',fr:'Aucun ticket.',en:'No tickets.'},
+  'Aucun résultat.':{ar:'لا توجد نتائج.',fr:'Aucun résultat.',en:'No results.'},
+  'GÉNÉRER UN QR ACTIF ↗':{ar:'إنشاء QR فعّال ↗',fr:'GÉNÉRER UN QR ACTIF ↗',en:'GENERATE ACTIVE QR ↗'},
+  'GÉNÉRATION…':{ar:'جارٍ الإنشاء…',fr:'GÉNÉRATION…',en:'GENERATING…'},
+  'SCANNEZ POUR ENTRER':{ar:'امسح للدخول',fr:'SCANNEZ POUR ENTRER',en:'SCAN TO ENTER'},
+  'Aucun client':{ar:'لا يوجد زبون',fr:'Aucun client',en:'No customer'},
+  'Libre':{ar:'متاح',fr:'Libre',en:'Available'},
+  'EN SERVICE':{ar:'قيد الخدمة',fr:'EN SERVICE',en:'IN SERVICE'},
+  'FILE D’ATTENTE':{ar:'قائمة الانتظار',fr:'FILE D’ATTENTE',en:'WAITING QUEUE'},
+  "FILE D'ATTENTE":{ar:'قائمة الانتظار',fr:"FILE D'ATTENTE",en:'WAITING QUEUE'},
+  'CLIENTS EN SERVICE':{ar:'الزبائن قيد الخدمة',fr:'CLIENTS EN SERVICE',en:'CUSTOMERS BEING SERVED'},
+  'Prendre votre tour simplement':{ar:'خذ دورك بسهولة',fr:'Prenez votre tour simplement',en:'Take your turn easily'}
+ };
+ const allPhrases=[]; Object.keys(dict).forEach(k=>{[k,dict[k].ar,dict[k].fr,dict[k].en].forEach(v=>{if(v&&!allPhrases.includes(v))allPhrases.push(v)})});
+ function translateText(value,lang){const raw=value;const trimmed=raw.trim();if(!trimmed)return raw;let key=Object.keys(dict).find(k=>[k,dict[k].ar,dict[k].fr,dict[k].en].includes(trimmed));if(!key)return raw;const lead=raw.match(/^\s*/)[0],trail=raw.match(/\s*$/)[0];return lead+(dict[key][lang]||dict[key].fr)+trail}
+ function setLang(lang){if(!['ar','fr','en'].includes(lang))lang='fr';localStorage.setItem('bq-ui-language',lang);document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('arabic',lang==='ar');
+  // Translate ordinary text nodes without replacing element contents/handlers.
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;while(node=walker.nextNode()){if(node.parentElement?.closest('.bq-language-switch,[data-no-translate],script,style'))continue;const next=translateText(node.nodeValue,lang);if(next!==node.nodeValue)node.nodeValue=next;}
+  document.querySelectorAll('input[placeholder],textarea[placeholder],option').forEach(el=>{const next=translateText(el.getAttribute('placeholder')||el.textContent,lang);if(el.hasAttribute('placeholder'))el.setAttribute('placeholder',next);else if(el.tagName==='OPTION')el.textContent=next});
+  document.querySelectorAll('[data-bq-lang]').forEach(b=>b.classList.toggle('active',b.dataset.bqLang===lang));
+  // Update the existing index/TV selectors if present.
+  document.querySelectorAll('.lang,.lang-btn').forEach(b=>{const t=(b.id||'').toLowerCase();b.classList.toggle('active',(lang==='fr'&&t.includes('fr'))||(lang==='ar'&&t.includes('ar'))||(lang==='en'&&t.includes('en')))});
+ }
+ window.bqSetLanguage=setLang;
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-bq-lang]');if(b)setLang(b.dataset.bqLang)});
+ document.addEventListener('DOMContentLoaded',()=>setLang(localStorage.getItem('bq-ui-language')||localStorage.getItem('barber-queue-language')||localStorage.getItem('tv-language')||'fr'));
+ // Run once immediately too, since this script is placed near </body>.
+ setLang(localStorage.getItem('bq-ui-language')||localStorage.getItem('barber-queue-language')||localStorage.getItem('tv-language')||'fr');
+})();
+</script>
 </body>
 
 </html>

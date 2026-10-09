@@ -1,7 +1,11 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BARBER QUEUE — Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"><style>
 :root{--bg:#05060a;--line:#ffffff16;--muted:#8991a2;--blue:#789cff;--cyan:#61e7ff;--green:#55efa4}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#29325b66,transparent 40%),#05060a;color:#f7f8fb;font-family:Inter,Arial,sans-serif}.wrap{width:min(1400px,94%);margin:auto;padding:25px 0 60px}.top,.row,.item,.head{display:flex;align-items:center;justify-content:space-between;gap:12px}.top{padding-bottom:20px;border-bottom:1px solid var(--line);flex-wrap:wrap}.logo{background:#e1e8ff;color:#05060a;border-radius:13px;padding:15px;font-weight:900;margin-right:10px}.brand{display:flex;align-items:center}.muted,.note{color:var(--muted);font-size:11px;line-height:1.7}.btn{padding:11px 14px;border:1px solid var(--line);border-radius:11px;background:#ffffff0a;color:white;cursor:pointer;font-size:10px;font-weight:800}.primary{background:linear-gradient(135deg,#e4eaff,#8ea9ff);color:#05060a;border:0}.hero{padding:35px 0 20px}.hero h1{font:700 clamp(34px,5vw,58px) "Space Grotesk";margin:0;letter-spacing:-2px}.eyebrow{color:var(--cyan);font-size:9px;font-weight:800;letter-spacing:3px;margin-bottom:12px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.stat,.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#151925dd,#080a10ed);padding:20px;box-shadow:inset 0 1px #ffffff08}.label{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:1px}.value{font:700 clamp(23px,3vw,34px) "Space Grotesk";margin-top:13px}.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.panel{margin-bottom:14px;min-width:0}.panel h3{font:700 15px "Space Grotesk";margin:0 0 7px}.chart{height:180px;display:flex;align-items:end;gap:10px;margin-top:15px;border-bottom:1px solid var(--line)}.barcol{flex:1;display:flex;height:100%;flex-direction:column;justify-content:end;align-items:center;gap:8px;min-width:0}.bar{width:min(42px,70%);border-radius:7px 7px 1px 1px;background:linear-gradient(#61e7ff,#789cff);min-height:3px}.barlabel,.barvalue{font-size:8px;color:var(--muted);white-space:nowrap}.field{min-width:0;width:100%;padding:11px;border-radius:10px;background:#05070c;border:1px solid var(--line);color:#fff;font:11px Inter}.formrow{display:grid;grid-template-columns:1fr 110px auto;gap:7px;margin:14px 0}.list{display:grid;gap:8px}.item{border:1px solid #ffffff0c;border-radius:11px;padding:11px;font-size:11px}.item>div{min-width:0}.price{width:90px}.small{padding:7px 9px;font-size:9px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:10px}th,td{text-align:left;padding:12px 7px;border-bottom:1px solid #ffffff0b;white-space:nowrap}th{font-size:8px;color:var(--muted)}.pill{color:var(--green);background:#55efa411;border-radius:7px;padding:5px}.login{position:fixed;inset:0;background:#030409f5;backdrop-filter:blur(20px);display:grid;place-items:center;padding:20px;z-index:4}.loginbox{width:min(420px,100%);padding:28px;border:1px solid var(--line);border-radius:22px;background:#111520;box-shadow:0 30px 100px #000}.loginbox h1{font:700 28px "Space Grotesk"}.loginbox p{color:var(--muted);font-size:11px;line-height:1.7}.hidden{display:none!important}.error{color:#ff8c9e;font-size:11px;min-height:18px}.notice{font-size:10px;color:var(--muted);line-height:1.7;margin-top:12px}.tag{font-size:8px;color:var(--cyan);letter-spacing:1px}.pro-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}.pro-stat{position:relative;overflow:hidden;border:1px solid #61e7ff22;border-radius:16px;padding:18px;background:linear-gradient(145deg,#111a2b,#080a12);box-shadow:inset 0 1px #ffffff10}.pro-stat:after{content:"";position:absolute;width:110px;height:110px;right:-45px;top:-50px;border-radius:50%;background:#61e7ff12;filter:blur(4px)}.pro-value{font:700 clamp(20px,2.5vw,30px) "Space Grotesk";margin-top:10px;color:#e9f8ff}.pro-accent{color:var(--green)}.danger{border-color:#ff758955;color:#ffb6c2;background:linear-gradient(135deg,#37131e88,#170b12)}.expense-form{display:grid;grid-template-columns:1.2fr 1fr 130px auto;gap:8px;margin:14px 0}.service-breakdown{display:grid;gap:9px;margin-top:12px}.service-line{display:grid;grid-template-columns:minmax(90px,1fr) 2fr auto;gap:10px;align-items:center;font-size:10px}.service-track{height:7px;border-radius:10px;background:#ffffff0c;overflow:hidden}.service-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#61e7ff,#789cff)}@media(max-width:850px){.pro-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-form{grid-template-columns:1fr 1fr}.expense-form button{grid-column:1/-1}}@media(max-width:520px){.pro-grid{grid-template-columns:1fr 1fr}.expense-form{grid-template-columns:1fr}.expense-form button{grid-column:auto}}@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.stat,.panel{padding:14px}.formrow{grid-template-columns:1fr 90px}.formrow .btn{grid-column:1/-1}.top{align-items:flex-start}}
 .qr-layout{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;align-items:center}.qr-preview{min-height:220px;display:grid;place-items:center;padding:16px;background:#fff;border-radius:16px;max-width:220px}.qr-preview img,.qr-preview canvas{max-width:100%;height:auto}.qr-result{display:none;margin-top:14px;padding:14px;border:1px solid #61e7ff33;border-radius:13px;background:#61e7ff08;overflow-wrap:anywhere}.qr-result.active{display:block}.qr-link{font-size:11px;line-height:1.8;color:#dbeafe;overflow-wrap:anywhere}.qr-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}@media(max-width:600px){.qr-layout{grid-template-columns:1fr}.qr-preview{margin:auto}}.actionrow{display:flex;gap:6px;flex-wrap:wrap}.actionrow .btn{padding:7px 8px}.status-select{max-width:125px}
+
+/* Shared AR / FR / EN language control */
+.bq-language-switch{position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;gap:4px;padding:5px;border:1px solid #ffffff26;border-radius:14px;background:rgba(5,8,16,.9);box-shadow:0 10px 35px #0008;backdrop-filter:blur(16px)}.bq-language-switch button{border:0;border-radius:9px;padding:9px 11px;background:transparent;color:#aab6ca;font:800 10px Inter,Arial,sans-serif;cursor:pointer}.bq-language-switch button.active{background:linear-gradient(135deg,#e4eaff,#8ea9ff);color:#05060a}
 </style></head><body>
+<div class="bq-language-switch" aria-label="Language"><button type="button" data-bq-lang="ar">AR</button><button type="button" data-bq-lang="fr">FR</button><button type="button" data-bq-lang="en">EN</button></div>
 <div class="login" id="login"><form class="loginbox" id="loginForm"><div class="logo">BQ</div><div class="eyebrow" style="margin-top:20px">ESPACE PRIVÉ</div><h1>Business dashboard.</h1><p>Consultez les clients, les recettes estimées et gérez les tarifs, catégories et postes.</p><input class="field" id="authEmail" type="email" autocomplete="username" placeholder="Email administrateur Supabase" required><input class="field" id="password" type="password" autocomplete="current-password" placeholder="Mot de passe Supabase" required><div class="error" id="loginError"></div><button class="btn primary" style="width:100%" type="submit">DÉVERROUILLER ↗</button><p class="notice">Connexion sécurisée via Supabase Auth. Créez d’abord un utilisateur administrateur dans Supabase → Authentication → Users.</p></form></div>
 <div class="wrap hidden" id="app"><header class="top"><div class="brand"><div class="logo">BQ</div><div><b id="dashboardSalonName">BARBER QUEUE</b><div class="muted">BUSINESS INTELLIGENCE / ADMIN</div></div></div><div class="row"><a class="btn primary" href="admin.html" style="text-decoration:none">← Retour / Back</a><button class="btn" id="refresh">↻ ACTUALISER</button><button class="btn danger" id="resetDatabase">↺ RÉINITIALISER LES DONNÉES</button><button class="btn" id="logout">VERROUILLER</button></div></header>
 <section class="hero"><div class="eyebrow" id="dashboardSalonEyebrow">BARBER QUEUE / BUSINESS INTELLIGENCE</div><h1>Analytics <span style="color:#829fff">PRO.</span></h1><p class="note">Centre de contrôle financier : recettes, dépenses, bénéfice net, performances des prestations et activité en direct.</p></section>
@@ -102,4 +106,140 @@ document.getElementById('downloadSecureQr').addEventListener('click',()=>{
 });
 document.getElementById('copySecureQrLink').addEventListener('click',async()=>{if(!currentSecureQrUrl)return;try{await navigator.clipboard.writeText(currentSecureQrUrl);qrStatus('Lien QR copié.')}catch(e){window.prompt('Copiez le lien QR sécurisé :',currentSecureQrUrl)}});
 db.auth.getSession().then(({data})=>{if(data.session){sessionStorage.setItem("bq_unlocked","1");unlock()}});
-</script></body></html>
+</script><script>
+(function(){
+ const dict={
+  'Gestion en temps réel.':{ar:'إدارة مباشرة.',fr:'Gestion en temps réel.',en:'Real-time management.'},
+  'TERMINER LE RENDEZ-VOUS':{ar:'إنهاء الموعد',fr:'TERMINER LE RENDEZ-VOUS',en:'FINISH APPOINTMENT'},
+  'APPELER LE SUIVANT':{ar:'استدعاء التالي',fr:'APPELER LE SUIVANT',en:'CALL NEXT'},
+  'APPELER RENDEZ-VOUS':{ar:'استدعاء الموعد',fr:'APPELER RENDEZ-VOUS',en:'CALL APPOINTMENT'},
+  'Terminer le client':{ar:'إنهاء خدمة الزبون',fr:'Terminer le client',en:'Finish customer'},
+  'RENDEZ-VOUS CONFIRMÉS':{ar:'المواعيد المؤكدة',fr:'RENDEZ-VOUS CONFIRMÉS',en:'CONFIRMED APPOINTMENTS'},
+  'Consultez les clients, les recettes estimées et gérez les tarifs, catégories et postes.':{ar:'تابع الزبائن والمداخيل التقديرية وأدر الأسعار والخدمات ومحطات الحلاقة.',fr:'Consultez les clients, les recettes estimées et gérez les tarifs, catégories et postes.',en:'View customers and estimated revenue, and manage prices, services and barber stations.'},
+  'Connexion sécurisée via Supabase Auth. Créez d’abord un utilisateur administrateur dans Supabase → Authentication → Users.':{ar:'اتصال آمن عبر Supabase Auth. أنشئ أولًا مستخدم إدارة من Supabase → Authentication → Users.',fr:'Connexion sécurisée via Supabase Auth. Créez d’abord un utilisateur administrateur dans Supabase → Authentication → Users.',en:'Secure sign-in via Supabase Auth. First create an admin user in Supabase → Authentication → Users.'},
+  'Email administrateur Supabase':{ar:'البريد الإلكتروني للإدارة',fr:'Email administrateur Supabase',en:'Supabase admin email'},
+  'Mot de passe Supabase':{ar:'كلمة مرور Supabase',fr:'Mot de passe Supabase',en:'Supabase password'},
+  'CHIFFRE D’AFFAIRES':{ar:'رقم الأعمال',fr:'CHIFFRE D’AFFAIRES',en:'REVENUE'},
+  'DÉPENSES ENREGISTRÉES':{ar:'المصاريف المسجلة',fr:'DÉPENSES ENREGISTRÉES',en:'RECORDED EXPENSES'},
+  'BÉNÉFICE NET ESTIMÉ':{ar:'صافي الربح التقديري',fr:'BÉNÉFICE NET ESTIMÉ',en:'ESTIMATED NET PROFIT'},
+  'PANIER MOYEN':{ar:'متوسط الفاتورة',fr:'PANIER MOYEN',en:'AVERAGE BILL'},
+  'Prestations terminées':{ar:'الخدمات المكتملة',fr:'Prestations terminées',en:'Completed services'},
+  'Charges saisies':{ar:'المصاريف المدخلة',fr:'Charges saisies',en:'Expenses entered'},
+  'Recettes − dépenses':{ar:'المداخيل − المصاريف',fr:'Recettes − dépenses',en:'Revenue − expenses'},
+  'Par prestation terminée':{ar:'لكل خدمة مكتملة',fr:'Par prestation terminée',en:'Per completed service'},
+  'CLIENTS REÇUS':{ar:'الزبائن المستقبَلون',fr:'CLIENTS REÇUS',en:'CUSTOMERS RECEIVED'},
+  'PRESTATIONS TERMINÉES':{ar:'الخدمات المكتملة',fr:'PRESTATIONS TERMINÉES',en:'COMPLETED SERVICES'},
+  'RECETTES ESTIMÉES':{ar:'المداخيل التقديرية',fr:'RECETTES ESTIMÉES',en:'ESTIMATED REVENUE'},
+  'Dinars algériens':{ar:'دينار جزائري',fr:'Dinars algériens',en:'Algerian dinars'},
+  'Analyse des recettes':{ar:'تحليل المداخيل',fr:'Analyse des recettes',en:'Revenue analysis'},
+  'Recettes estimées des 7 derniers jours pour les tickets terminés.':{ar:'المداخيل التقديرية لآخر 7 أيام للتذاكر المكتملة.',fr:'Recettes estimées des 7 derniers jours pour les tickets terminés.',en:'Estimated revenue from completed tickets over the last 7 days.'},
+  'Calcul indicatif : le tarif actuel est appliqué aux tickets terminés. Pour des comptes exacts, il faut enregistrer le prix appliqué à chaque ticket.':{ar:'حساب تقريبي: يُطبّق السعر الحالي على التذاكر المكتملة. للدقة، سجّل السعر الفعلي لكل تذكرة.',fr:'Calcul indicatif : le tarif actuel est appliqué aux tickets terminés. Pour des comptes exacts, il faut enregistrer le prix appliqué à chaque ticket.',en:'Estimate: current prices are applied to completed tickets. For accuracy, save the actual price for each ticket.'},
+  'Performance par prestation':{ar:'أداء الخدمات',fr:'Performance par prestation',en:'Service performance'},
+  'Classement selon les prestations terminées et leur chiffre d’affaires.':{ar:'ترتيب الخدمات حسب عدد الخدمات المكتملة والمداخيل.',fr:'Classement selon les prestations terminées et leur chiffre d’affaires.',en:'Ranking by completed services and revenue.'},
+  'Activité récente':{ar:'النشاط الأخير',fr:'Activité récente',en:'Recent activity'},
+  'Derniers tickets depuis Supabase.':{ar:'آخر التذاكر من Supabase.',fr:'Derniers tickets depuis Supabase.',en:'Latest tickets from Supabase.'},
+  'Dépenses & charges':{ar:'المصاريف والتكاليف',fr:'Dépenses & charges',en:'Expenses & costs'},
+  'Ajoutez loyer, produits, matériel, salaires ou autres charges pour estimer le bénéfice net. Ces entrées sont partagées dans Supabase.':{ar:'أضف الإيجار والمنتجات والمعدات والرواتب أو غيرها لتقدير صافي الربح. تُحفظ البيانات في Supabase.',fr:'Ajoutez loyer, produits, matériel, salaires ou autres charges pour estimer le bénéfice net. Ces entrées sont partagées dans Supabase.',en:'Add rent, products, equipment, salaries or other costs to estimate net profit. Entries are shared in Supabase.'},
+  'Ex. Produits de coiffure':{ar:'مثال: منتجات الحلاقة',fr:'Ex. Produits de coiffure',en:'e.g. Barber products'},
+  'Montant DA':{ar:'المبلغ بالدينار',fr:'Montant DA',en:'Amount (DA)'},
+  '+ AJOUTER':{ar:'+ إضافة',fr:'+ AJOUTER',en:'+ ADD'},
+  'Dépense':{ar:'المصروف',fr:'Dépense',en:'Expense'},
+  'Catégorie':{ar:'الفئة',fr:'Catégorie',en:'Category'},
+  'Montant':{ar:'المبلغ',fr:'Montant',en:'Amount'},
+  'Tarifs des prestations':{ar:'أسعار الخدمات',fr:'Tarifs des prestations',en:'Service prices'},
+  'Prix en dinars algériens (DA).':{ar:'الأسعار بالدينار الجزائري (DA).',fr:'Prix en dinars algériens (DA).',en:'Prices in Algerian dinars (DA).'},
+  'Ex. Broshing':{ar:'مثال: بروشينغ',fr:'Ex. Broshing',en:'e.g. Blow-dry'},
+  'Prix DA':{ar:'السعر بالدينار',fr:'Prix DA',en:'Price (DA)'},
+  'Catégories':{ar:'الخدمات',fr:'Catégories',en:'Services'},
+  'Postes / fauteuils':{ar:'محطات / كراسي الحلاقة',fr:'Postes / fauteuils',en:'Barber stations / chairs'},
+  'Sécurité du dashboard':{ar:'أمان لوحة الإدارة',fr:'Sécurité du dashboard',en:'Dashboard security'},
+  'CHANGER LE MOT DE PASSE':{ar:'تغيير كلمة المرور',fr:'CHANGER LE MOT DE PASSE',en:'CHANGE PASSWORD'},
+  'Rendez-vous demandés':{ar:'المواعيد المطلوبة',fr:'Rendez-vous demandés',en:'Requested appointments'},
+  'Équipe / Barbiers':{ar:'الفريق / الحلاقون',fr:'Équipe / Barbiers',en:'Team / Barbers'},
+  'Fidélité clients':{ar:'ولاء الزبائن',fr:'Fidélité clients',en:'Customer loyalty'},
+  'Téléphone':{ar:'الهاتف',fr:'Téléphone',en:'Phone'},
+  'Visites':{ar:'الزيارات',fr:'Visites',en:'Visits'},
+  'Points':{ar:'النقاط',fr:'Points',en:'Points'},
+  'Dernière visite':{ar:'آخر زيارة',fr:'Dernière visite',en:'Last visit'},
+  'Profil du salon':{ar:'ملف الصالون',fr:'Profil du salon',en:'Salon profile'},
+  'ENREGISTRER':{ar:'حفظ',fr:'ENREGISTRER',en:'SAVE'},
+  'QR Code sécurisé du salon':{ar:'رمز QR آمن للصالون',fr:'QR Code sécurisé du salon',en:'Secure salon QR code'},
+  'DURÉE DE VALIDITÉ':{ar:'مدة الصلاحية',fr:'DURÉE DE VALIDITÉ',en:'VALIDITY PERIOD'},
+  'TÉLÉCHARGER PNG':{ar:'تحميل PNG',fr:'TÉLÉCHARGER PNG',en:'DOWNLOAD PNG'},
+  'COPIER LE LIEN':{ar:'نسخ الرابط',fr:'COPIER LE LIEN',en:'COPY LINK'},
+  'Nom du salon':{ar:'اسم الصالون',fr:'Nom du salon',en:'Salon name'},
+  'Choisissez votre service':{ar:'اختر خدمتك',fr:'Choisissez votre service',en:'Choose your service'},
+  'Carte fidélité (facultatif)':{ar:'بطاقة الولاء (اختياري)',fr:'Carte fidélité (facultatif)',en:'Loyalty card (optional)'},
+  'Coupe':{ar:'حلاقة الشعر',fr:'Coupe',en:'Haircut'},
+  'Barbe':{ar:'اللحية',fr:'Barbe',en:'Beard trim'},
+  'Coupe + Barbe':{ar:'الشعر + اللحية',fr:'Coupe + Barbe',en:'Haircut + Beard'},
+  'Coupe de cheveux →':{ar:'حلاقة الشعر ←',fr:'Coupe de cheveux →',en:'Haircut →'},
+  'Taille et finition →':{ar:'تشذيب وتشطيب ←',fr:'Taille et finition →',en:'Trim and finish →'},
+  'Service complet →':{ar:'خدمة كاملة ←',fr:'Service complet →',en:'Full service →'},
+  'Prendre un ticket':{ar:'أخذ تذكرة',fr:'Prendre un ticket',en:'Get a ticket'},
+  'Prendre rendez-vous':{ar:'حجز موعد',fr:'Prendre rendez-vous',en:'Book an appointment'},
+  'BARBER QUEUE / BUSINESS INTELLIGENCE':{ar:'BARBER QUEUE / ذكاء الأعمال',fr:'BARBER QUEUE / BUSINESS INTELLIGENCE',en:'BARBER QUEUE / BUSINESS INTELLIGENCE'},
+  'Retour / Back':{ar:'رجوع',fr:'Retour',en:'Back'},
+  '← Retour / Back':{ar:'رجوع ←',fr:'← Retour',en:'← Back'},
+  'Retour à l’accueil':{ar:'العودة للرئيسية',fr:'Retour à l’accueil',en:'Back to home'},
+  'Prendre un ticket':{ar:'أخذ تذكرة',fr:'Prendre un ticket',en:'Get a ticket'},
+  'Prendre rendez-vous':{ar:'حجز موعد',fr:'Prendre rendez-vous',en:'Book an appointment'},
+  'Prendre un autre ticket':{ar:'أخذ تذكرة أخرى',fr:'Prendre un autre ticket',en:'Get another ticket'},
+  'Choisissez une prestation pour prendre votre ticket.':{ar:'اختر الخدمة للحصول على تذكرتك.',fr:'Choisissez une prestation pour prendre votre ticket.',en:'Choose a service to get your ticket.'},
+  'Choisir une option':{ar:'اختر خيارًا',fr:'Choisir une option',en:'Choose an option'},
+  'Réserver un créneau':{ar:'احجز موعدًا',fr:'Réserver un créneau',en:'Book a time slot'},
+  'Nom / الاسم':{ar:'الاسم',fr:'Nom / الاسم',en:'Name'},
+  'Téléphone / الهاتف':{ar:'الهاتف',fr:'Téléphone / الهاتف',en:'Phone'},
+  'Choisir un service':{ar:'اختر الخدمة',fr:'Choisir un service',en:'Choose a service'},
+  "N'importe quel coiffeur":{ar:'أي حلاق',fr:"N'importe quel coiffeur",en:'Any barber'},
+  'DEMANDER UN RENDEZ-VOUS ↗':{ar:'طلب موعد ↗',fr:'DEMANDER UN RENDEZ-VOUS ↗',en:'REQUEST APPOINTMENT ↗'},
+  'LIVE QUEUE / FILE EN DIRECT':{ar:'الطابور المباشر',fr:'LIVE QUEUE / FILE EN DIRECT',en:'LIVE QUEUE'},
+  'Votre attente en temps réel':{ar:'انتظارك في الوقت الفعلي',fr:'Votre attente en temps réel',en:'Your live wait'},
+  'Les chiffres se mettent à jour automatiquement.':{ar:'يتم تحديث الأرقام تلقائيًا.',fr:'Les chiffres se mettent à jour automatiquement.',en:'Numbers update automatically.'},
+  'Ticket en service':{ar:'التذكرة الحالية',fr:'Ticket en service',en:'Now serving'},
+  'En attente':{ar:'في الانتظار',fr:'En attente',en:'Waiting'},
+  'Attente estimée':{ar:'الانتظار المتوقع',fr:'Attente estimée',en:'Estimated wait'},
+  'BUSINESS INTELLIGENCE / ADMIN':{ar:'ذكاء الأعمال / الإدارة',fr:'BUSINESS INTELLIGENCE / ADMIN',en:'BUSINESS INTELLIGENCE / ADMIN'},
+  '← Retour / Back':{ar:'رجوع ←',fr:'← Retour',en:'← Back'},
+  '↻ ACTUALISER':{ar:'↻ تحديث',fr:'↻ ACTUALISER',en:'↻ REFRESH'},
+  'RÉINITIALISER LES DONNÉES':{ar:'إعادة ضبط البيانات',fr:'RÉINITIALISER LES DONNÉES',en:'RESET DATA'},
+  'VERROUILLER':{ar:'قفل',fr:'VERROUILLER',en:'LOCK'},
+  'ESPACE PRIVÉ':{ar:'مساحة خاصة',fr:'ESPACE PRIVÉ',en:'PRIVATE AREA'},
+  'Business dashboard.':{ar:'لوحة إدارة الأعمال',fr:'Business dashboard.',en:'Business dashboard.'},
+  'DÉVERROUILLER ↗':{ar:'فتح ↗',fr:'DÉVERROUILLER ↗',en:'UNLOCK ↗'},
+  'SYSTÈME EN DIRECT':{ar:'النظام مباشر',fr:'SYSTÈME EN DIRECT',en:'SYSTEM LIVE'},
+  'DIGITAL QUEUE SYSTEM':{ar:'نظام الطابور الرقمي',fr:'DIGITAL QUEUE SYSTEM',en:'DIGITAL QUEUE SYSTEM'},
+  'SERVICES':{ar:'الخدمات',fr:'SERVICES',en:'SERVICES'},
+  'Aucun client fidélité.':{ar:'لا يوجد زبائن في برنامج الولاء.',fr:'Aucun client fidélité.',en:'No loyalty customers yet.'},
+  'Aucun rendez-vous.':{ar:'لا توجد مواعيد.',fr:'Aucun rendez-vous.',en:'No appointments.'},
+  'Aucun ticket.':{ar:'لا توجد تذاكر.',fr:'Aucun ticket.',en:'No tickets.'},
+  'Aucun résultat.':{ar:'لا توجد نتائج.',fr:'Aucun résultat.',en:'No results.'},
+  'GÉNÉRER UN QR ACTIF ↗':{ar:'إنشاء QR فعّال ↗',fr:'GÉNÉRER UN QR ACTIF ↗',en:'GENERATE ACTIVE QR ↗'},
+  'GÉNÉRATION…':{ar:'جارٍ الإنشاء…',fr:'GÉNÉRATION…',en:'GENERATING…'},
+  'SCANNEZ POUR ENTRER':{ar:'امسح للدخول',fr:'SCANNEZ POUR ENTRER',en:'SCAN TO ENTER'},
+  'Aucun client':{ar:'لا يوجد زبون',fr:'Aucun client',en:'No customer'},
+  'Libre':{ar:'متاح',fr:'Libre',en:'Available'},
+  'EN SERVICE':{ar:'قيد الخدمة',fr:'EN SERVICE',en:'IN SERVICE'},
+  'FILE D’ATTENTE':{ar:'قائمة الانتظار',fr:'FILE D’ATTENTE',en:'WAITING QUEUE'},
+  "FILE D'ATTENTE":{ar:'قائمة الانتظار',fr:"FILE D'ATTENTE",en:'WAITING QUEUE'},
+  'CLIENTS EN SERVICE':{ar:'الزبائن قيد الخدمة',fr:'CLIENTS EN SERVICE',en:'CUSTOMERS BEING SERVED'},
+  'Prendre votre tour simplement':{ar:'خذ دورك بسهولة',fr:'Prenez votre tour simplement',en:'Take your turn easily'}
+ };
+ const allPhrases=[]; Object.keys(dict).forEach(k=>{[k,dict[k].ar,dict[k].fr,dict[k].en].forEach(v=>{if(v&&!allPhrases.includes(v))allPhrases.push(v)})});
+ function translateText(value,lang){const raw=value;const trimmed=raw.trim();if(!trimmed)return raw;let key=Object.keys(dict).find(k=>[k,dict[k].ar,dict[k].fr,dict[k].en].includes(trimmed));if(!key)return raw;const lead=raw.match(/^\s*/)[0],trail=raw.match(/\s*$/)[0];return lead+(dict[key][lang]||dict[key].fr)+trail}
+ function setLang(lang){if(!['ar','fr','en'].includes(lang))lang='fr';localStorage.setItem('bq-ui-language',lang);document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('arabic',lang==='ar');
+  // Translate ordinary text nodes without replacing element contents/handlers.
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;while(node=walker.nextNode()){if(node.parentElement?.closest('.bq-language-switch,[data-no-translate],script,style'))continue;const next=translateText(node.nodeValue,lang);if(next!==node.nodeValue)node.nodeValue=next;}
+  document.querySelectorAll('input[placeholder],textarea[placeholder],option').forEach(el=>{const next=translateText(el.getAttribute('placeholder')||el.textContent,lang);if(el.hasAttribute('placeholder'))el.setAttribute('placeholder',next);else if(el.tagName==='OPTION')el.textContent=next});
+  document.querySelectorAll('[data-bq-lang]').forEach(b=>b.classList.toggle('active',b.dataset.bqLang===lang));
+  // Update the existing index/TV selectors if present.
+  document.querySelectorAll('.lang,.lang-btn').forEach(b=>{const t=(b.id||'').toLowerCase();b.classList.toggle('active',(lang==='fr'&&t.includes('fr'))||(lang==='ar'&&t.includes('ar'))||(lang==='en'&&t.includes('en')))});
+ }
+ window.bqSetLanguage=setLang;
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-bq-lang]');if(b)setLang(b.dataset.bqLang)});
+ document.addEventListener('DOMContentLoaded',()=>setLang(localStorage.getItem('bq-ui-language')||localStorage.getItem('barber-queue-language')||localStorage.getItem('tv-language')||'fr'));
+ // Run once immediately too, since this script is placed near </body>.
+ setLang(localStorage.getItem('bq-ui-language')||localStorage.getItem('barber-queue-language')||localStorage.getItem('tv-language')||'fr');
+})();
+</script>
+</body></html>
