@@ -1070,7 +1070,7 @@
 
                 <div class="brand-text">
 
-                    <div class="brand-name">
+                    <div class="brand-name" id="tvSalonName">
                         BARBER QUEUE
                     </div>
 
@@ -1157,7 +1157,7 @@
 
             <div class="hero-right">
 
-                <div class="system-label">
+                <div class="system-label" id="tvSystemLabel">
                     BARBER QUEUE / LIVE DISPLAY
                 </div>
 
@@ -1392,7 +1392,7 @@
         <!-- FOOTER -->
         <footer class="footer">
 
-            <div>
+            <div id="tvFooterSalonName">
                 BARBER QUEUE
             </div>
 
@@ -1463,7 +1463,7 @@
             }
             expiry.textContent="VALIDE JUSQU’À "+expires.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
         }
-        async function loadTVSettings(){const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();let names=Array.isArray(data?.config?.chairs)&&data.config.chairs.length?data.config.chairs:tvChairNames;if(error)console.warn("TV settings unavailable",error.message);renderTVSecureQr(data?.config||{});if(!tvChairsBuilt||JSON.stringify(names)!==JSON.stringify(tvChairNames)){buildTVChairs(names);tvChairsBuilt=true;return true}return false}
+        async function loadTVSettings(){const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();const config=data?.config||{};const salonName=String(config.salonName||"BARBER QUEUE").trim()||"BARBER QUEUE";const brand=document.getElementById("tvSalonName");if(brand)brand.textContent=salonName;const footer=document.getElementById("tvFooterSalonName");if(footer)footer.textContent=salonName;const label=document.getElementById("tvSystemLabel");if(label)label.textContent=salonName+" / LIVE DISPLAY";document.title=salonName+" — TV";let names=Array.isArray(config.chairs)&&config.chairs.length?config.chairs:tvChairNames;if(error)console.warn("TV settings unavailable",error.message);renderTVSecureQr(config);if(!tvChairsBuilt||JSON.stringify(names)!==JSON.stringify(tvChairNames)){buildTVChairs(names);tvChairsBuilt=true;return true}return false}
 
 
         async function loadTV() {

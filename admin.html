@@ -1601,7 +1601,7 @@ body{
 
         <div>
 
-            <div class="brand">
+            <div class="brand" id="adminSalonName">
                 BARBER QUEUE
             </div>
 
@@ -1989,7 +1989,7 @@ body{
 
 <footer class="footer">
 
-    <span>
+    <span id="adminFooterSalonName">
         BARBER QUEUE
     </span>
 
@@ -2035,7 +2035,12 @@ function buildAdminChairs(names){
 async function loadAdminSettings(){
     const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();
     if(error){console.warn("Settings table unavailable; using three default posts",error.message);buildAdminChairs(adminChairNames);adminChairsBuilt=true;return false}
-    const names=Array.isArray(data?.config?.chairs)&&data.config.chairs.length?data.config.chairs:adminChairNames;
+    const config=data?.config||{};
+    const salonName=String(config.salonName||"BARBER QUEUE").trim()||"BARBER QUEUE";
+    const brand=document.getElementById("adminSalonName");if(brand)brand.textContent=salonName;
+    const footerName=document.getElementById("adminFooterSalonName");if(footerName)footerName.textContent=salonName;
+    document.title=salonName+" — ADMIN";
+    const names=Array.isArray(config.chairs)&&config.chairs.length?config.chairs:adminChairNames;
     if(!adminChairsBuilt||JSON.stringify(names)!==JSON.stringify(adminChairNames)){buildAdminChairs(names);adminChairsBuilt=true;return true}
     return false;
 }

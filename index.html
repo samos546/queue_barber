@@ -2268,7 +2268,7 @@ html.qr-required body::after {
 
             <div>
 
-                <div class="brand">
+                <div class="brand" id="salonNameDisplay">
                     BARBER QUEUE
                 </div>
 
@@ -3130,6 +3130,10 @@ async function loadDynamicQueueCategories(){
     const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();
     if(error){console.warn("Queue services could not load",error.message);return}
     const config=data?.config||{};
+    const salonName=String(config.salonName||"BARBER QUEUE").trim()||"BARBER QUEUE";
+    const salonBrand=document.getElementById("salonNameDisplay");if(salonBrand)salonBrand.textContent=salonName;
+    document.title=salonName;
+    const footer=document.querySelector(".footer");if(footer){const fr=footer.getAttribute("data-fr");const ar=footer.getAttribute("data-ar");if(fr)footer.setAttribute("data-fr",salonName+" · REALTIME MANAGEMENT");if(ar)footer.setAttribute("data-ar",salonName+" · نظام الطابور الرقمي");if(currentLanguage==="ar")footer.textContent=footer.getAttribute("data-ar");else footer.textContent=footer.getAttribute("data-fr");}
     const services=Array.isArray(config.services)?config.services:[];
     const host=document.querySelector("#services .services");if(!host)return;
     const previous=host.dataset.servicesSignature||"";
