@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>BARBER QUEUE — TV</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #050507;
+            --bg2: #09090c;
+
+            --white: #ffffff;
+            --text: #f7f7f8;
+            --muted: #777780;
+
+            --green: #22c55e;
+            --green-soft: rgba(34, 197, 94, .14);
+            --green-glow: rgba(34, 197, 94, .32);
+
+            --glass: rgba(255, 255, 255, .045);
+            --glass-strong: rgba(255, 255, 255, .075);
+
+            --border: rgba(255, 255, 255, .09);
+            --border-soft: rgba(255, 255, 255, .055);
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 50% -20%,
+                    rgba(255,255,255,.065),
+                    transparent 38%
+                ),
+                radial-gradient(
+                    circle at 0% 100%,
+                    rgba(34,197,94,.055),
+                    transparent 30%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* =========================
+           BACKGROUND
+        ========================= */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .12;
+            animation: floatOrb 14s ease-in-out infinite;
+        }
+
+        .orb.one {
+            width: 420px;
+            height: 420px;
+            left: -180px;
+            top: 10%;
+            background: #ffffff;
+        }
+
+        .orb.two {
+            width: 500px;
+            height: 500px;
+            right: -220px;
+            top: 15%;
+            background: #334155;
+            animation-delay: -5s;
+        }
+
+        .orb.three {
+            width: 380px;
+            height: 380px;
+            left: 40%;
+            bottom: -220px;
+            background: #22c55e;
+            opacity: .055;
+            animation-delay: -8s;
+        }
+
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate3d(30px, -25px, 0) scale(1.08);
+            }
+        }
+
+        .grid {
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.018) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.018) 1px,
+                    transparent 1px
+                );
+
+            background-size: 70px 70px;
+
+            mask-image: linear-gradient(
+                to bottom,
+                rgba(0,0,0,.8),
+                transparent 90%
+            );
+        }
+
+        .scanline {
+            position: absolute;
+            left: -20%;
+            top: 0;
+
+            width: 140%;
+            height: 1px;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,.13),
+                transparent
+            );
+
+            box-shadow: 0 0 25px rgba(255,255,255,.06);
+
+            animation: scan 8s linear infinite;
+            opacity: .45;
+        }
+
+        @keyframes scan {
+            from {
+                transform: translateY(-20vh);
+            }
+
+            to {
+                transform: translateY(120vh);
+            }
+        }
+
+        /* =========================
+           SCREEN
+        ========================= */
+
+        .screen {
+            position: relative;
+            z-index: 2;
+
+            width: min(1700px, calc(100% - 80px));
+            min-height: 100vh;
+
+            margin: auto;
+
+            padding:
+                34px 0
+                55px;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            padding-bottom: 32px;
+
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.13),
+                    rgba(255,255,255,.035)
+                );
+
+            border: 1px solid var(--border);
+
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.08),
+                0 15px 45px rgba(0,0,0,.35);
+        }
+
+        .logo span {
+            font-size: 18px;
+            font-weight: 950;
+            letter-spacing: -.08em;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: .13em;
+        }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .22em;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* =========================
+           LIVE STATUS
+        ========================= */
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 12px 16px;
+
+            border-radius: 14px;
+
+            background: rgba(34,197,94,.055);
+            border: 1px solid rgba(34,197,94,.16);
+
+            color: #a7f3c0;
+
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .16em;
+
+            box-shadow:
+                0 0 35px rgba(34,197,94,.045);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+
+            box-shadow:
+                0 0 0 5px rgba(34,197,94,.08),
+                0 0 18px rgba(34,197,94,.8);
+
+            animation: livePulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .55;
+                transform: scale(.8);
+            }
+        }
+
+        /* =========================
+           LANGUAGE BUTTON
+        ========================= */
+
+        .language-switch {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            padding: 5px;
+
+            background: rgba(255,255,255,.045);
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 15px 35px rgba(0,0,0,.28),
+                inset 0 1px 0 rgba(255,255,255,.04);
+        }
+
+        .lang-btn {
+            min-width: 44px;
+            height: 32px;
+
+            border: 0;
+            outline: none;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: #707078;
+
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+
+            cursor: pointer;
+
+            transition:
+                color .25s ease,
+                background .25s ease,
+                transform .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .lang-btn:hover {
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            color: #050507;
+
+            background: var(--green);
+
+            box-shadow:
+                0 0 22px rgba(34,197,94,.25);
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            padding:
+                58px 0
+                42px;
+        }
+
+        .hero-left {
+            max-width: 850px;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 16px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow-line {
+            width: 34px;
+            height: 1px;
+
+            background: var(--green);
+
+            box-shadow: 0 0 12px var(--green);
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 6vw, 92px);
+
+            line-height: .92;
+
+            letter-spacing: -.065em;
+
+            font-weight: 950;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff 0%,
+                    #d8d8dc 55%,
+                    #777780 100%
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+        }
+
+        .hero h1 span {
+            display: block;
+
+            color: var(--green);
+
+            background: none;
+            -webkit-text-fill-color: var(--green);
+
+            font-size: .42em;
+
+            letter-spacing: .05em;
+
+            margin-top: 17px;
+        }
+
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+
+            gap: 8px;
+        }
+
+        .system-label {
+            color: #55555c;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .2em;
+        }
+
+        .system-count {
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: .12em;
+        }
+
+        /* =========================
+           CARDS GRID
+        ========================= */
+
+        .chairs-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+        /* =========================
+           CHAIR CARD
+        ========================= */
+
+        .chair-card {
+            position: relative;
+
+            min-height: 470px;
+
+            padding: 27px;
+
+            overflow: hidden;
+
+            border-radius: 28px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.075),
+                    rgba(255,255,255,.025)
+                );
+
+            border: 1px solid var(--border);
+
+            box-shadow:
+                0 30px 80px rgba(0,0,0,.35),
+                inset 0 1px 0 rgba(255,255,255,.045);
+
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+
+            transition:
+                border-color .45s ease,
+                transform .45s ease,
+                box-shadow .45s ease,
+                background .45s ease;
+        }
+
+        .chair-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+            height: 250px;
+
+            right: -120px;
+            top: -120px;
+
+            border-radius: 50%;
+
+            background: rgba(255,255,255,.025);
+
+            filter: blur(35px);
+        }
+
+        .chair-card::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,255,255,.1),
+                    transparent
+                );
+        }
+
+        .chair-card.active {
+            border-color: rgba(34,197,94,.28);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(34,197,94,.075),
+                    rgba(255,255,255,.025)
+                );
+
+            box-shadow:
+                0 35px 100px rgba(0,0,0,.48),
+                0 0 60px rgba(34,197,94,.055),
+                inset 0 1px 0 rgba(255,255,255,.055);
+        }
+
+        .chair-card.active:hover {
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 45px 110px rgba(0,0,0,.55),
+                0 0 80px rgba(34,197,94,.1);
+        }
+
+        /* =========================
+           CARD TOP
+        ========================= */
+
+        .card-top {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chair-number {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #686870;
+
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .2em;
+        }
+
+        .chair-number strong {
+            color: #fff;
+
+            font-size: 13px;
+
+            letter-spacing: .05em;
+        }
+
+        .active-indicator {
+            display: inline-flex;
+            align-items: center;
+
+            min-height: 27px;
+
+            padding: 0 10px;
+
+            border-radius: 9px;
+
+            background: rgba(255,255,255,.045);
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            color: #686870;
+
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .16em;
+        }
+
+        .chair-card.active .active-indicator {
+            color: #8ef0b0;
+
+            background: rgba(34,197,94,.09);
+
+            border-color: rgba(34,197,94,.18);
+
+            box-shadow:
+                0 0 25px rgba(34,197,94,.06);
+        }
+
+        /* =========================
+           TICKET
+        ========================= */
+
+        .ticket-area {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+
+            min-height: 280px;
+
+            padding: 20px 0;
+        }
+
+        .ticket-label {
+            margin-bottom: 12px;
+
+            color: #55555c;
+
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .22em;
+        }
+
+        .ticket {
+            font-size: clamp(72px, 7vw, 118px);
+
+            line-height: .9;
+
+            letter-spacing: -.07em;
+
+            font-weight: 950;
+
+            color: #25252a;
+
+            transition:
+                color .45s ease,
+                text-shadow .45s ease;
+        }
+
+        .chair-card.active .ticket {
+            color: #fff;
+
+            text-shadow:
+                0 0 55px rgba(255,255,255,.07);
+        }
+
+        /* =========================
+           SERVICE
+        ========================= */
+
+        .service-area {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding-top: 24px;
+
+            border-top: 1px solid rgba(255,255,255,.055);
+        }
+
+        .service-info {
+            min-width: 0;
+        }
+
+        .service-label {
+            margin-bottom: 7px;
+
+            color: #55555c;
+
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .2em;
+        }
+
+        .service {
+            max-width: 240px;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            color: #8b8b93;
+
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .chair-card.active .service {
+            color: #f2f2f3;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #4f4f56;
+
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .14em;
+
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #4f4f56;
+        }
+
+        .chair-card.active .status {
+            color: #8ef0b0;
+        }
+
+        .chair-card.active .status-dot {
+            background: var(--green);
+
+            box-shadow:
+                0 0 12px rgba(34,197,94,.8);
+        }
+
+        /* =========================
+           ACTIVE LIGHT
+        ========================= */
+
+        .active-light {
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            left: 50%;
+            top: 48%;
+
+            transform: translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background: rgba(34,197,94,.035);
+
+            filter: blur(35px);
+
+            opacity: 0;
+
+            transition: opacity .5s ease;
+        }
+
+        .chair-card.active .active-light {
+            opacity: 1;
+
+            animation: activeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes activeGlow {
+            0%,
+            100% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(.85);
+            }
+
+            50% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(1.15);
+            }
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-top: 24px;
+            padding-top: 22px;
+
+            border-top: 1px solid var(--border-soft);
+
+            color: #4f4f56;
+
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .18em;
+        }
+
+        .footer-live {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-live span:first-child {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        /* =========================
+           RTL
+        ========================= */
+
+        html[dir="rtl"] .brand-text,
+        html[dir="rtl"] .hero-left,
+        html[dir="rtl"] .chair-card,
+        html[dir="rtl"] .footer {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .hero-right {
+            align-items: flex-start;
+        }
+
+        html[dir="rtl"] .eyebrow {
+            flex-direction: row-reverse;
+        }
+
+        html[dir="rtl"] .card-top,
+        html[dir="rtl"] .service-area {
+            direction: rtl;
+        }
+
+        html[dir="rtl"] .ticket {
+            letter-spacing: -.04em;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1200px) {
+
+            .screen {
+                width: min(94%, 1100px);
+            }
+
+            .chair-card {
+                min-height: 430px;
+            }
+
+            .ticket-area {
+                min-height: 245px;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .screen {
+                padding-top: 22px;
+            }
+
+            .hero {
+                padding-top: 42px;
+            }
+
+            .chairs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chair-card {
+                min-height: 360px;
+            }
+
+            .ticket-area {
+                min-height: 190px;
+            }
+
+            .ticket {
+                font-size: 90px;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .screen {
+                width: calc(100% - 30px);
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-right {
+                align-items: flex-start;
+            }
+
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        /* =========================
+           REDUCED MOTION
+        ========================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    .tv-post-name{display:block;font-size:12px;opacity:.72;margin-top:4px;letter-spacing:.5px}
+        /* Secure QR shown live on the salon TV */
+        .tv-qr-panel{position:fixed;right:clamp(14px,2.2vw,34px);bottom:clamp(14px,2.2vw,30px);z-index:50;width:clamp(170px,15vw,225px);padding:14px;border:1px solid #61e7ff66;border-radius:20px;background:linear-gradient(145deg,rgba(13,20,36,.97),rgba(5,7,13,.97));box-shadow:0 0 35px #61e7ff24,inset 0 1px #ffffff14;backdrop-filter:blur(18px);display:none;animation:tvQrIn .45s cubic-bezier(.2,.8,.2,1) both}
+        .tv-qr-panel.visible{display:block}.tv-qr-kicker{font-size:9px;font-weight:900;letter-spacing:2px;color:#61e7ff;text-transform:uppercase}.tv-qr-title{font-size:clamp(12px,1vw,15px);font-weight:800;margin:7px 0 11px;color:#fff}.tv-qr-code{width:100%;aspect-ratio:1;display:grid;place-items:center;padding:9px;background:#fff;border-radius:12px;overflow:hidden}.tv-qr-code img,.tv-qr-code canvas{display:block;max-width:100%;max-height:100%;width:100%!important;height:auto!important;image-rendering:pixelated}.tv-qr-foot{font-size:9px;line-height:1.5;color:#b8c5d9;text-align:center;margin-top:9px}.tv-qr-live{display:inline-block;width:6px;height:6px;border-radius:50%;background:#55efa4;box-shadow:0 0 10px #55efa4;margin-right:5px}.tv-qr-expiry{color:#61e7ff;font-size:8px;margin-top:5px;text-align:center}
+        @keyframes tvQrIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @media(max-width:900px){.tv-qr-panel{width:145px;padding:9px;right:10px;bottom:10px}.tv-qr-title{font-size:11px}.tv-qr-foot{font-size:8px}}
+        @media(max-height:600px){.tv-qr-panel{width:125px;padding:7px}.tv-qr-title{margin:4px 0 6px}.tv-qr-foot{margin-top:4px}}
+</style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND -->
+    <div class="background">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+        <div class="orb three"></div>
+
+        <div class="grid"></div>
+        <div class="scanline"></div>
+    </div>
+
+
+    <!-- MAIN SCREEN -->
+    <main class="screen">
+
+        <aside id="tvSecureQrPanel" class="tv-qr-panel" aria-live="polite">
+            <div class="tv-qr-kicker"><span class="tv-qr-live"></span>ACCÈS SÉCURISÉ</div>
+            <div class="tv-qr-title">SCANNEZ POUR ENTRER</div>
+            <div id="tvSecureQrCode" class="tv-qr-code"><span style="color:#111;font-size:10px">QR</span></div>
+            <div class="tv-qr-foot">Scannez avec votre téléphone pour prendre un ticket ou réserver</div>
+            <div id="tvSecureQrExpiry" class="tv-qr-expiry"></div>
+        </aside>
+
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+
+            <div class="brand">
+
+                <div class="logo">
+                    <span>BQ</span>
+                </div>
+
+                <div class="brand-text">
+
+                    <div class="brand-name">
+                        BARBER QUEUE
+                    </div>
+
+                    <div
+                        class="brand-subtitle"
+                        data-i18n="queueSystem">
+                        DIGITAL QUEUE SYSTEM
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="live-status">
+
+                    <span class="live-dot"></span>
+
+                    <span data-i18n="systemLive">
+                        SYSTÈME EN DIRECT
+                    </span>
+
+                </div>
+
+
+                <!-- LANGUAGE -->
+                <div class="language-switch">
+
+                    <button
+                        id="lang-fr"
+                        class="lang-btn active"
+                        type="button">
+                        FR
+                    </button>
+
+                    <button
+                        id="lang-ar"
+                        class="lang-btn"
+                        type="button">
+                        AR
+                    </button>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- HERO -->
+        <section class="hero">
+
+            <div class="hero-left">
+
+                <div class="eyebrow">
+
+                    <span
+                        class="eyebrow-line">
+                    </span>
+
+                    <span data-i18n="queue">
+                        FILE D'ATTENTE
+                    </span>
+
+                </div>
+
+
+                <h1>
+
+                    <span data-i18n="serving">
+                        CLIENTS EN SERVICE
+                    </span>
+
+                    <span>
+                        NOW SERVING
+                    </span>
+
+                </h1>
+
+            </div>
+
+
+            <div class="hero-right">
+
+                <div class="system-label">
+                    BARBER QUEUE / LIVE DISPLAY
+                </div>
+
+                <div class="system-count">
+                    03 POSTES
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHAIRS -->
+        <section class="chairs-grid">
+
+
+            <!-- CHAIR 1 -->
+            <article
+                id="tv-card-1"
+                class="chair-card">
+
+                <div class="active-light"></div>
+
+                <div class="card-top">
+
+                    <div class="chair-number">
+                        POSTE
+                        <strong>01</strong>
+                    </div>
+
+                    <div class="active-indicator">
+                        DISPONIBLE
+                    </div>
+
+                </div>
+
+
+                <div class="ticket-area">
+
+                    <div class="ticket-label">
+                        TICKET
+                    </div>
+
+                    <div
+                        id="tv-ticket-1"
+                        class="ticket">
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="service-area">
+
+                    <div class="service-info">
+
+                        <div class="service-label">
+                            SERVICE
+                        </div>
+
+                        <div
+                            id="tv-service-1"
+                            class="service">
+                            Libre
+                        </div>
+
+                    </div>
+
+
+                    <div class="status">
+
+                        <span class="status-dot"></span>
+
+                        <span
+                            id="tv-status-1">
+                            Aucun client
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="tv-appointment" id="tv-appointment-1" style="display:none;margin-top:14px;padding:14px;border-radius:12px;border:1px solid #61e7ff66;background:#61e7ff12;text-align:left">
+                  <div style="font-size:10px;letter-spacing:2px;font-weight:900;color:#61e7ff;margin-bottom:6px">RENDEZ-VOUS APPELÉ</div>
+                  <div class="tv-appointment-details" id="tv-appointment-details-1" style="font-size:15px;font-weight:800"></div>
+                </div>
+
+            </article>
+
+
+            <!-- CHAIR 2 -->
+            <article
+                id="tv-card-2"
+                class="chair-card">
+
+                <div class="active-light"></div>
+
+                <div class="card-top">
+
+                    <div class="chair-number">
+                        POSTE
+                        <strong>02</strong>
+                    </div>
+
+                    <div class="active-indicator">
+                        DISPONIBLE
+                    </div>
+
+                </div>
+
+
+                <div class="ticket-area">
+
+                    <div class="ticket-label">
+                        TICKET
+                    </div>
+
+                    <div
+                        id="tv-ticket-2"
+                        class="ticket">
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="service-area">
+
+                    <div class="service-info">
+
+                        <div class="service-label">
+                            SERVICE
+                        </div>
+
+                        <div
+                            id="tv-service-2"
+                            class="service">
+                            Libre
+                        </div>
+
+                    </div>
+
+
+                    <div class="status">
+
+                        <span class="status-dot"></span>
+
+                        <span
+                            id="tv-status-2">
+                            Aucun client
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- CHAIR 3 -->
+            <article
+                id="tv-card-3"
+                class="chair-card">
+
+                <div class="active-light"></div>
+
+                <div class="card-top">
+
+                    <div class="chair-number">
+                        POSTE
+                        <strong>03</strong>
+                    </div>
+
+                    <div class="active-indicator">
+                        DISPONIBLE
+                    </div>
+
+                </div>
+
+
+                <div class="ticket-area">
+
+                    <div class="ticket-label">
+                        TICKET
+                    </div>
+
+                    <div
+                        id="tv-ticket-3"
+                        class="ticket">
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="service-area">
+
+                    <div class="service-info">
+
+                        <div class="service-label">
+                            SERVICE
+                        </div>
+
+                        <div
+                            id="tv-service-3"
+                            class="service">
+                            Libre
+                        </div>
+
+                    </div>
+
+
+                    <div class="status">
+
+                        <span class="status-dot"></span>
+
+                        <span
+                            id="tv-status-3">
+                            Aucun client
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="footer">
+
+            <div>
+                BARBER QUEUE
+            </div>
+
+            <div class="footer-live">
+
+                <span></span>
+
+                <span>
+                    REAL-TIME QUEUE
+                </span>
+
+            </div>
+
+        </footer>
+
+    </main>
+
+
+    <!-- =========================
+         SUPABASE
+         DO NOT MODIFY LOGIC
+    ========================= -->
+
+    <script>
+
+        const SUPABASE_URL =
+            "https://fuyxvhhisoajfwaghwiv.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_RC9oaIkUMVEZjgs9rCAWtg_2MmnaQpX";
+
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+        let tvChairNames=["Poste 1","Poste 2","Poste 3"],tvChairsBuilt=false;
+        function escapeTV(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+        function buildTVChairs(names){
+            const host=document.querySelector(".chairs-grid");if(!host)return;
+            const template=document.getElementById("tv-card-1").cloneNode(true);
+            tvChairNames=(names&&names.length?names:["Poste 1","Poste 2","Poste 3"]).slice();host.innerHTML="";
+            tvChairNames.forEach((name,index)=>{const n=index+1,card=template.cloneNode(true);
+                card.innerHTML=card.innerHTML.replace(/(tv-card|tv-ticket|tv-service|tv-status|tv-appointment|tv-appointment-details)-1\b/g,"$1-"+n);
+                card.id="tv-card-"+n;
+                const num=card.querySelector(".chair-number");if(num)num.innerHTML='POSTE <strong>'+String(n).padStart(2,"0")+'</strong><span class="tv-post-name">'+escapeTV(name)+'</span>';
+                host.appendChild(card);
+            });
+            const count=document.querySelector(".system-count");if(count)count.textContent=String(tvChairNames.length).padStart(2,"0")+" POSTES";
+        }
+        let lastTvQrUrl="";
+        function renderTVSecureQr(config){
+            const panel=document.getElementById("tvSecureQrPanel"),host=document.getElementById("tvSecureQrCode"),expiry=document.getElementById("tvSecureQrExpiry");
+            if(!panel||!host)return;
+            const url=String(config?.activeQrUrl||"");
+            const expires=config?.activeQrExpiresAt?new Date(config.activeQrExpiresAt):null;
+            if(!url||!expires||Number.isNaN(expires.getTime())||expires.getTime()<=Date.now()){
+                panel.classList.remove("visible");host.innerHTML="";lastTvQrUrl="";if(expiry)expiry.textContent="";return;
+            }
+            panel.classList.add("visible");
+            if(url!==lastTvQrUrl){
+                host.innerHTML="";
+                if(typeof QRCode==="undefined"){host.textContent="QR indisponible";return;}
+                new QRCode(host,{text:url,width:220,height:220,colorDark:"#05060a",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+                lastTvQrUrl=url;
+            }
+            expiry.textContent="VALIDE JUSQU’À "+expires.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+        }
+        async function loadTVSettings(){const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();let names=Array.isArray(data?.config?.chairs)&&data.config.chairs.length?data.config.chairs:tvChairNames;if(error)console.warn("TV settings unavailable",error.message);renderTVSecureQr(data?.config||{});if(!tvChairsBuilt||JSON.stringify(names)!==JSON.stringify(tvChairNames)){buildTVChairs(names);tvChairsBuilt=true;return true}return false}
+
+
+        async function loadTV() {
+            const [{ data, error }, { data: calledAppointments, error: appointmentError }] = await Promise.all([
+                supabaseClient.from("queue_tickets").select("id,ticket_number,ticket_code,service,status,chair,created_at,called_at,price_da").eq("status", "serving").order("called_at", { ascending: false }),
+                supabaseClient.from("queue_appointments").select("id,customer_name,service,appointment_at,status,chair,called_at").eq("status", "called").order("called_at", { ascending: false }).limit(100)
+            ]);
+            if (error) { console.error("TV ticket error:", error); return; }
+            if (appointmentError) console.warn("TV appointments unavailable:", appointmentError.message);
+
+
+            for (
+                let chair = 1;
+                chair <= tvChairNames.length;
+                chair++
+            ) {
+
+                document.getElementById(
+                    `tv-ticket-${chair}`
+                ).textContent = "—";
+
+
+                document.getElementById(
+                    `tv-service-${chair}`
+                ).textContent = "Libre";
+
+
+                document.getElementById(
+                    `tv-status-${chair}`
+                ).textContent =
+                    "Aucun client";
+
+
+                document.getElementById(
+                    `tv-card-${chair}`
+                ).classList.remove("active");
+
+
+                document.querySelector(
+                    `#tv-card-${chair} .active-indicator`
+                ).textContent = "DISPONIBLE";
+
+            }
+
+
+            (data || []).forEach(client => {
+
+                const chair =
+                    Number(client.chair);
+
+
+                if (!Number.isInteger(chair) || chair < 1 || chair > tvChairNames.length) {
+                    return;
+                }
+
+
+                document.getElementById(
+                    `tv-ticket-${chair}`
+                ).textContent =
+                    client.ticket_code;
+
+
+                document.getElementById(
+                    `tv-service-${chair}`
+                ).textContent =
+                    client.service;
+
+
+                document.getElementById(
+                    `tv-status-${chair}`
+                ).textContent =
+                    "EN SERVICE";
+
+
+                document.getElementById(
+                    `tv-card-${chair}`
+                ).classList.add("active");
+
+
+                document.querySelector(
+                    `#tv-card-${chair} .active-indicator`
+                ).textContent =
+                    "EN DIRECT";
+
+            });
+
+            for (let chair=1; chair<=tvChairNames.length; chair++) {
+                const box=document.getElementById(`tv-appointment-${chair}`);
+                const details=document.getElementById(`tv-appointment-details-${chair}`);
+                if(!box||!details)continue;
+                const appt=(calledAppointments||[]).find(a=>Number(a.chair)===chair);
+                if(!appt){box.style.display='none';details.textContent='';continue;}
+                box.style.display='block';
+                details.textContent=`${appt.customer_name} · ${appt.service} · ${new Date(appt.appointment_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+            }
+
+        }
+
+
+        /* =========================
+           REALTIME
+        ========================= */
+
+        supabaseClient
+            .channel("tv-queue")
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "queue_tickets"
+                },
+                function (payload) {
+
+                    console.log(
+                        "TV update:",
+                        payload
+                    );
+
+                    loadTV();
+
+                }
+            )
+            .subscribe(function (status) {
+                console.log("TV Realtime:", status);
+            });
+        supabaseClient.channel("tv-appointments").on("postgres_changes", {event:"*", schema:"public", table:"queue_appointments"}, loadTV).subscribe(status=>console.log("TV Appointment Realtime:",status));
+        supabaseClient.channel("tv-salon-settings").on("postgres_changes", {event:"*", schema:"public", table:"barber_queue_settings"}, async()=>{await loadTVSettings();}).subscribe(status=>console.log("TV settings Realtime:",status));
+
+        loadTVSettings().then(()=>loadTV());
+        setInterval(async()=>{await loadTVSettings();await loadTV()},5000);
+
+
+        /* =========================
+           LANGUAGE
+        ========================= */
+
+        const translations = {
+
+            fr: {
+
+                systemLive:
+                    "SYSTÈME EN DIRECT",
+
+                queue:
+                    "FILE D'ATTENTE",
+
+                serving:
+                    "CLIENTS EN SERVICE",
+
+                queueSystem:
+                    "DIGITAL QUEUE SYSTEM",
+
+                available:
+                    "DISPONIBLE",
+
+                live:
+                    "EN DIRECT",
+
+                free:
+                    "Libre",
+
+                noCustomer:
+                    "Aucun client",
+
+                inService:
+                    "EN SERVICE"
+
+            },
+
+            ar: {
+
+                systemLive:
+                    "النظام مباشر",
+
+                queue:
+                    "قائمة الانتظار",
+
+                serving:
+                    "الزبائن قيد الخدمة",
+
+                queueSystem:
+                    "نظام الطوابير الرقمي",
+
+                available:
+                    "متاح",
+
+                live:
+                    "مباشر",
+
+                free:
+                    "فارغ",
+
+                noCustomer:
+                    "لا يوجد زبون",
+
+                inService:
+                    "قيد الخدمة"
+
+            }
+
+        };
+
+
+        let currentLanguage =
+            localStorage.getItem("tv-language") || "fr";
+
+
+        function setLanguage(lang) {
+
+            currentLanguage = lang;
+
+
+            document.documentElement.dir =
+                lang === "ar"
+                    ? "rtl"
+                    : "ltr";
+
+
+            document.documentElement.lang =
+                lang;
+
+
+            document
+                .querySelectorAll("[data-i18n]")
+                .forEach(element => {
+
+                    const key =
+                        element.dataset.i18n;
+
+                    if (
+                        translations[lang] &&
+                        translations[lang][key]
+                    ) {
+
+                        element.textContent =
+                            translations[lang][key];
+
+                    }
+
+                });
+
+
+            document
+                .getElementById("lang-fr")
+                .classList.toggle(
+                    "active",
+                    lang === "fr"
+                );
+
+
+            document
+                .getElementById("lang-ar")
+                .classList.toggle(
+                    "active",
+                    lang === "ar"
+                );
+
+
+            localStorage.setItem(
+                "tv-language",
+                lang
+            );
+
+        }
+
+
+        document
+            .getElementById("lang-fr")
+            .addEventListener(
+                "click",
+                () => setLanguage("fr")
+            );
+
+
+        document
+            .getElementById("lang-ar")
+            .addEventListener(
+                "click",
+                () => setLanguage("ar")
+            );
+
+
+        setLanguage(currentLanguage);
+
+    
+setInterval(loadTV,5000);
+</script>
+
+</body>
+
+</html>

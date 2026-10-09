@@ -1,0 +1,3211 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>BARBER QUEUE</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root{
+
+    --bg:#050507;
+
+    --panel:#0a0b0f;
+
+    --text:#f7f7f8;
+
+    --muted:#777780;
+
+    --dim:#4e4e56;
+
+    --line:rgba(255,255,255,.075);
+
+    --line-soft:rgba(255,255,255,.045);
+
+    --green:#22c55e;
+
+    --green-soft:rgba(34,197,94,.10);
+
+    --green-glow:rgba(34,197,94,.25);
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+
+html{
+
+    min-height:100%;
+
+    background:var(--bg);
+
+}
+
+
+body{
+
+    min-height:100vh;
+
+    color:var(--text);
+
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
+
+    background:
+
+        radial-gradient(
+            circle at 50% -20%,
+            rgba(255,255,255,.065),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 0% 100%,
+            rgba(34,197,94,.045),
+            transparent 30%
+        ),
+
+        var(--bg);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:28px;
+
+    overflow-x:hidden;
+
+    -webkit-font-smoothing:antialiased;
+
+}
+
+
+/* =========================================================
+   CINEMATIC BACKGROUND
+========================================================= */
+
+.background{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:0;
+
+    overflow:hidden;
+
+    pointer-events:none;
+
+}
+
+
+.background::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+        radial-gradient(
+            ellipse at center,
+            transparent 20%,
+            rgba(0,0,0,.45) 100%
+        );
+
+}
+
+
+.orb{
+
+    position:absolute;
+
+    border-radius:50%;
+
+    filter:blur(120px);
+
+    animation:
+        orbFloat
+        15s
+        ease-in-out
+        infinite
+        alternate;
+
+}
+
+
+.orb.one{
+
+    width:480px;
+
+    height:480px;
+
+    left:-280px;
+
+    top:-280px;
+
+    background:#ffffff;
+
+    opacity:.055;
+
+}
+
+
+.orb.two{
+
+    width:500px;
+
+    height:500px;
+
+    right:-280px;
+
+    bottom:-300px;
+
+    background:#22c55e;
+
+    opacity:.045;
+
+    animation-delay:-5s;
+
+}
+
+
+.orb.three{
+
+    width:280px;
+
+    height:280px;
+
+    left:55%;
+
+    top:25%;
+
+    background:#ffffff;
+
+    opacity:.025;
+
+    animation-delay:-9s;
+
+}
+
+
+@keyframes orbFloat{
+
+    0%{
+
+        transform:
+            translate3d(0,0,0)
+            scale(1);
+
+    }
+
+    100%{
+
+        transform:
+            translate3d(65px,-45px,0)
+            scale(1.12);
+
+    }
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:.025;
+
+    background-image:
+
+        linear-gradient(
+            rgba(255,255,255,.8) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.8) 1px,
+            transparent 1px
+        );
+
+    background-size:80px 80px;
+
+    mask-image:
+        radial-gradient(
+            ellipse at center,
+            black,
+            transparent 75%
+        );
+
+}
+
+
+/* =========================================================
+   MOVING LIGHT
+========================================================= */
+
+.light{
+
+    position:absolute;
+
+    width:1000px;
+
+    height:1px;
+
+    left:-1100px;
+
+    top:42%;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0),
+            rgba(255,255,255,.45),
+            rgba(255,255,255,.7),
+            rgba(255,255,255,0),
+            transparent
+        );
+
+    transform:rotate(-20deg);
+
+    opacity:.16;
+
+    animation:
+        lightMove
+        10s
+        linear
+        infinite;
+
+}
+
+
+@keyframes lightMove{
+
+    from{
+
+        transform:
+            translateX(-600px)
+            rotate(-20deg);
+
+    }
+
+    to{
+
+        transform:
+            translateX(2500px)
+            rotate(-20deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.particles{
+
+    position:absolute;
+
+    inset:0;
+
+}
+
+
+.particle{
+
+    position:absolute;
+
+    bottom:-10px;
+
+    width:2px;
+
+    height:2px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    opacity:0;
+
+    animation:
+        particleMove
+        linear
+        infinite;
+
+}
+
+
+@keyframes particleMove{
+
+    0%{
+
+        transform:translateY(0);
+
+        opacity:0;
+
+    }
+
+    15%{
+
+        opacity:.18;
+
+    }
+
+    80%{
+
+        opacity:.14;
+
+    }
+
+    100%{
+
+        transform:translateY(-110vh);
+
+        opacity:0;
+
+    }
+
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.container{
+
+    position:relative;
+
+    z-index:5;
+
+    width:100%;
+
+    max-width:530px;
+
+    animation:
+        pageEnter
+        .8s
+        cubic-bezier(.2,.8,.2,1)
+        both;
+
+}
+
+
+@keyframes pageEnter{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateY(25px)
+            scale(.97);
+
+        filter:blur(7px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+        filter:blur(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.topbar{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:34px;
+
+}
+
+
+.identity{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:13px;
+
+}
+
+
+.logo{
+
+    position:relative;
+
+    width:48px;
+
+    height:48px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:15px;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #d7d7db
+        );
+
+    color:#050507;
+
+    font-family:"Space Grotesk";
+
+    font-size:13px;
+
+    font-weight:900;
+
+    letter-spacing:-.5px;
+
+    box-shadow:
+
+        0 15px 40px
+        rgba(0,0,0,.3),
+
+        0 0 30px
+        rgba(255,255,255,.055);
+
+}
+
+
+.logo::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:1px;
+
+    border-radius:14px;
+
+    border-top:1px solid
+        rgba(255,255,255,.8);
+
+    pointer-events:none;
+
+}
+
+
+.brand{
+
+    font-family:"Space Grotesk";
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:.12em;
+
+}
+
+
+.brand-sub{
+
+    margin-top:4px;
+
+    color:#575760;
+
+    font-size:7px;
+
+    font-weight:800;
+
+    letter-spacing:.22em;
+
+}
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+.language{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    padding:5px;
+
+    border:1px solid var(--line);
+
+    border-radius:15px;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.018)
+        );
+
+    backdrop-filter:blur(20px);
+
+    -webkit-backdrop-filter:blur(20px);
+
+    box-shadow:
+
+        0 15px 40px
+        rgba(0,0,0,.28),
+
+        inset 0 1px 0
+        rgba(255,255,255,.045);
+
+}
+
+
+.language::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:50%;
+
+    left:50%;
+
+    width:1px;
+
+    height:13px;
+
+    transform:
+        translate(-50%,-50%);
+
+    background:
+        rgba(255,255,255,.08);
+
+    pointer-events:none;
+
+}
+
+
+.lang{
+
+    position:relative;
+
+    z-index:2;
+
+    min-width:44px;
+
+    height:32px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:transparent;
+
+    color:#65656d;
+
+    font-family:Inter;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    letter-spacing:.08em;
+
+    cursor:pointer;
+
+    transition:
+
+        color .25s ease,
+
+        background .3s ease,
+
+        transform .25s ease,
+
+        box-shadow .3s ease;
+
+}
+
+
+.lang:hover{
+
+    color:#fff;
+
+    transform:translateY(-1px);
+
+}
+
+
+.lang.active{
+
+    color:#050507;
+
+    background:#fff;
+
+    box-shadow:
+
+        0 5px 20px
+        rgba(255,255,255,.12);
+
+}
+
+
+.lang.active:hover{
+
+    transform:scale(1.04);
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+
+    margin-bottom:23px;
+
+}
+
+
+.kicker{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:14px;
+
+    color:#5c5c65;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    letter-spacing:.25em;
+
+}
+
+
+.kicker::before{
+
+    content:"";
+
+    width:28px;
+
+    height:1px;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 12px
+        var(--green);
+
+}
+
+
+.hero-title{
+
+    font-family:"Space Grotesk";
+
+    font-size:
+        clamp(43px,10vw,65px);
+
+    line-height:.91;
+
+    letter-spacing:-.065em;
+
+    font-weight:700;
+
+}
+
+
+.hero-title span{
+
+    display:block;
+
+    color:#6c6c74;
+
+}
+
+
+.hero-title span:first-child{
+
+    color:#fff;
+
+}
+
+
+.hero-description{
+
+    max-width:410px;
+
+    margin-top:16px;
+
+    color:#65656e;
+
+    font-size:10px;
+
+    line-height:1.75;
+
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    border:1px solid var(--line);
+
+    border-radius:28px;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(18,18,22,.92),
+            rgba(7,7,9,.96)
+        );
+
+    box-shadow:
+
+        0 40px 110px
+        rgba(0,0,0,.5),
+
+        inset 0 1px 0
+        rgba(255,255,255,.045);
+
+    backdrop-filter:blur(30px);
+
+    -webkit-backdrop-filter:blur(30px);
+
+}
+
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:360px;
+
+    height:360px;
+
+    left:-210px;
+
+    top:-220px;
+
+    border-radius:50%;
+
+    background:
+
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.075),
+            transparent 70%
+        );
+
+    animation:
+        cardGlow
+        9s
+        ease-in-out
+        infinite
+        alternate;
+
+}
+
+
+@keyframes cardGlow{
+
+    to{
+
+        transform:
+            translate(300px,220px)
+            scale(1.1);
+
+    }
+
+}
+
+
+.card::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:14%;
+
+    width:72%;
+
+    height:1px;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.17),
+            transparent
+        );
+
+}
+
+
+.card-content{
+
+    position:relative;
+
+    z-index:3;
+
+    padding:27px;
+
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-head{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    margin-bottom:22px;
+
+}
+
+
+.card-kicker{
+
+    margin-bottom:7px;
+
+    color:#55555e;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.22em;
+
+}
+
+
+.card-title{
+
+    font-family:"Space Grotesk";
+
+    font-size:21px;
+
+    font-weight:700;
+
+    letter-spacing:-.04em;
+
+}
+
+
+.card-description{
+
+    margin-top:7px;
+
+    color:#5e5e67;
+
+    font-size:9px;
+
+    line-height:1.5;
+
+}
+
+
+.card-index{
+
+    color:#44444c;
+
+    font-family:"Space Grotesk";
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:.15em;
+
+}
+
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
+.services{
+
+    display:grid;
+
+    gap:10px;
+
+}
+
+
+.service{
+
+    position:relative;
+
+    width:100%;
+
+    min-height:78px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    padding:12px 13px;
+
+    overflow:hidden;
+
+    border:1px solid
+        rgba(255,255,255,.065);
+
+    border-radius:17px;
+
+    background:
+
+        linear-gradient(
+            110deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.012)
+        );
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-family:Inter;
+
+    text-align:left;
+
+    transition:
+
+        transform .35s
+        cubic-bezier(.2,.8,.2,1),
+
+        border-color .3s ease,
+
+        background .3s ease,
+
+        box-shadow .3s ease;
+
+}
+
+
+.service::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    bottom:0;
+
+    left:-80%;
+
+    width:50%;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.13),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    transition:.75s;
+
+}
+
+
+.service:hover::before{
+
+    left:145%;
+
+}
+
+
+.service:hover{
+
+    transform:
+        translateY(-3px)
+        scale(1.005);
+
+    border-color:
+        rgba(255,255,255,.15);
+
+    background:
+
+        linear-gradient(
+            110deg,
+            rgba(255,255,255,.065),
+            rgba(255,255,255,.018)
+        );
+
+    box-shadow:
+
+        0 20px 45px
+        rgba(0,0,0,.32),
+
+        0 0 30px
+        rgba(255,255,255,.025);
+
+}
+
+
+.service:active{
+
+    transform:scale(.975);
+
+}
+
+
+.service:disabled{
+
+    cursor:not-allowed;
+
+}
+
+
+.service-left{
+
+    position:relative;
+
+    z-index:2;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    min-width:0;
+
+}
+
+
+.service-icon{
+
+    width:45px;
+
+    height:45px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:13px;
+
+    background:
+        rgba(255,255,255,.035);
+
+    color:#a4a4ad;
+
+    font-family:"Space Grotesk";
+
+    font-size:10px;
+
+    font-weight:900;
+
+    transition:
+
+        background .3s ease,
+
+        color .3s ease,
+
+        transform .3s ease,
+
+        box-shadow .3s ease;
+
+}
+
+
+.service:hover .service-icon{
+
+    color:#050507;
+
+    background:#fff;
+
+    border-color:#fff;
+
+    transform:
+        scale(1.07)
+        rotate(-4deg);
+
+    box-shadow:
+
+        0 0 25px
+        rgba(255,255,255,.13);
+
+}
+
+
+.service-name{
+
+    font-family:"Space Grotesk";
+
+    font-size:13px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+
+.service-small{
+
+    margin-top:4px;
+
+    color:#62626b;
+
+    font-size:8px;
+
+    white-space:nowrap;
+
+}
+
+
+.arrow{
+
+    position:relative;
+
+    z-index:2;
+
+    width:31px;
+
+    height:31px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:1px solid
+        rgba(255,255,255,.055);
+
+    border-radius:10px;
+
+    color:#5b5b64;
+
+    font-size:14px;
+
+    transition:.3s;
+
+}
+
+
+.service:hover .arrow{
+
+    color:#fff;
+
+    border-color:
+        rgba(255,255,255,.14);
+
+    transform:translateX(3px);
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading{
+
+    display:none;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:13px;
+
+    padding:13px 15px;
+
+    border:1px solid
+        rgba(255,255,255,.055);
+
+    border-radius:13px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color:#74747c;
+
+    font-size:8px;
+
+}
+
+
+.spinner{
+
+    width:14px;
+
+    height:14px;
+
+    flex-shrink:0;
+
+    border:2px solid
+        #292930;
+
+    border-top-color:#fff;
+
+    border-radius:50%;
+
+    animation:
+        spin
+        .7s
+        linear
+        infinite;
+
+}
+
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   TICKET SCREEN
+========================================================= */
+
+#ticket{
+
+    display:none;
+
+}
+
+
+.ticket-card{
+
+    animation:
+        ticketAppear
+        .65s
+        cubic-bezier(.2,.8,.2,1)
+        both;
+
+}
+
+
+@keyframes ticketAppear{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateY(30px)
+            scale(.94);
+
+        filter:blur(8px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+        filter:blur(0);
+
+    }
+
+}
+
+
+.ticket-top{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+}
+
+
+.ticket-label{
+
+    color:#5b5b64;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.25em;
+
+}
+
+
+.live{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    color:#64646d;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.12em;
+
+}
+
+
+.live-dot{
+
+    width:6px;
+
+    height:6px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+
+        0 0 0 4px
+        rgba(34,197,94,.06),
+
+        0 0 15px
+        rgba(34,197,94,.75);
+
+    animation:
+        livePulse
+        1.8s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes livePulse{
+
+    0%,
+    100%{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+    50%{
+
+        opacity:.45;
+
+        transform:scale(.78);
+
+    }
+
+}
+
+
+.number{
+
+    position:relative;
+
+    margin:17px 0 3px;
+
+    text-align:center;
+
+    font-family:"Space Grotesk";
+
+    font-size:
+        clamp(82px,20vw,120px);
+
+    line-height:.95;
+
+    font-weight:700;
+
+    letter-spacing:-.075em;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 50px
+        rgba(255,255,255,.055);
+
+    animation:
+        numberGlow
+        3.5s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes numberGlow{
+
+    0%,
+    100%{
+
+        text-shadow:
+            0 0 25px
+            rgba(255,255,255,.04);
+
+    }
+
+    50%{
+
+        text-shadow:
+            0 0 60px
+            rgba(255,255,255,.12);
+
+    }
+
+}
+
+
+.service-badge{
+
+    display:block;
+
+    width:max-content;
+
+    margin:0 auto 25px;
+
+    padding:8px 14px;
+
+    border:1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:999px;
+
+    background:
+        rgba(255,255,255,.035);
+
+    color:#a4a4ac;
+
+    font-size:8px;
+
+    font-weight:800;
+
+}
+
+
+/* =========================================================
+   WAITING BOX
+========================================================= */
+
+.waiting-box{
+
+    position:relative;
+
+    overflow:hidden;
+
+    padding:20px;
+
+    border:1px solid
+        rgba(255,255,255,.065);
+
+    border-radius:17px;
+
+    background:
+
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.012)
+        );
+
+}
+
+
+.waiting-box::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:170px;
+
+    height:170px;
+
+    right:-110px;
+
+    top:-110px;
+
+    border-radius:50%;
+
+    background:
+        rgba(34,197,94,.055);
+
+    filter:blur(35px);
+
+}
+
+
+.waiting-box::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    bottom:0;
+
+    left:-60%;
+
+    width:35%;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.065),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        waitingScan
+        4s
+        linear
+        infinite;
+
+}
+
+
+@keyframes waitingScan{
+
+    from{
+        left:-60%;
+    }
+
+    to{
+        left:150%;
+    }
+
+}
+
+
+.waiting-title{
+
+    position:relative;
+
+    z-index:2;
+
+    color:#55555e;
+
+    font-size:8px;
+
+    font-weight:900;
+
+    letter-spacing:.2em;
+
+}
+
+
+.waiting-number{
+
+    position:relative;
+
+    z-index:2;
+
+    margin-top:7px;
+
+    font-family:"Space Grotesk";
+
+    font-size:34px;
+
+    font-weight:700;
+
+    letter-spacing:-.04em;
+
+}
+
+
+.waiting-description{
+
+    position:relative;
+
+    z-index:2;
+
+    margin-top:3px;
+
+    color:#606069;
+
+    font-size:8px;
+
+    line-height:1.6;
+
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.back-button{
+
+    width:100%;
+
+    height:46px;
+
+    margin-top:10px;
+
+    border:1px solid
+        rgba(255,255,255,.065);
+
+    border-radius:13px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color:#686870;
+
+    font-family:Inter;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:
+
+        color .3s,
+
+        background .3s,
+
+        border-color .3s,
+
+        transform .3s,
+
+        box-shadow .3s;
+
+}
+
+
+.back-button:hover{
+
+    color:#050507;
+
+    background:#fff;
+
+    border-color:#fff;
+
+    box-shadow:
+
+        0 12px 35px
+        rgba(255,255,255,.08);
+
+}
+
+
+.back-button:active{
+
+    transform:scale(.98);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+
+    margin-top:19px;
+
+    text-align:center;
+
+    color:#414149;
+
+    font-size:7px;
+
+    font-weight:800;
+
+    letter-spacing:.2em;
+
+}
+
+
+/* =========================================================
+   ARABIC
+========================================================= */
+
+body.arabic{
+
+    direction:rtl;
+
+}
+
+
+body.arabic .topbar{
+
+    direction:rtl;
+
+}
+
+
+body.arabic .hero{
+
+    text-align:right;
+
+}
+
+
+body.arabic .kicker{
+
+    flex-direction:row-reverse;
+
+}
+
+
+body.arabic .hero-description{
+
+    text-align:right;
+
+}
+
+
+body.arabic .card-head{
+
+    direction:rtl;
+
+    text-align:right;
+
+}
+
+
+body.arabic .service{
+
+    direction:rtl;
+
+    text-align:right;
+
+}
+
+
+body.arabic .service-left{
+
+    text-align:right;
+
+}
+
+
+body.arabic .arrow{
+
+    transform:rotate(180deg);
+
+}
+
+
+body.arabic .service:hover .arrow{
+
+    transform:
+        rotate(180deg)
+        translateX(3px);
+
+}
+
+
+body.arabic .ticket-top{
+
+    direction:rtl;
+
+}
+
+
+body.arabic .waiting-box{
+
+    text-align:right;
+
+}
+
+
+body.arabic .footer{
+
+    direction:rtl;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px){
+
+    body{
+
+        padding:17px;
+
+        align-items:flex-start;
+
+    }
+
+
+    .container{
+
+        margin-top:5px;
+
+    }
+
+
+    .topbar{
+
+        margin-bottom:28px;
+
+    }
+
+
+    .hero{
+
+        margin-bottom:19px;
+
+    }
+
+
+    .card-content{
+
+        padding:20px;
+
+    }
+
+
+    .hero-title{
+
+        font-size:
+            clamp(39px,12vw,55px);
+
+    }
+
+
+    .card-title{
+
+        font-size:18px;
+
+    }
+
+
+    .service{
+
+        min-height:72px;
+
+    }
+
+
+}
+
+
+@media(max-width:400px){
+
+    body{
+
+        padding:12px;
+
+    }
+
+
+    .logo{
+
+        width:43px;
+
+        height:43px;
+
+    }
+
+
+    .brand{
+
+        font-size:12px;
+
+    }
+
+
+    .brand-sub{
+
+        font-size:6px;
+
+    }
+
+
+    .card-content{
+
+        padding:17px;
+
+    }
+
+
+    .service{
+
+        min-height:67px;
+
+        padding:10px;
+
+    }
+
+
+    .service-icon{
+
+        width:39px;
+
+        height:39px;
+
+    }
+
+
+    .service-name{
+
+        font-size:12px;
+
+    }
+
+
+    .service-small{
+
+        font-size:7px;
+
+    }
+
+
+    .lang{
+
+        min-width:38px;
+
+        height:29px;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *{
+
+        animation-duration:.01ms !important;
+
+        animation-iteration-count:1 !important;
+
+        transition-duration:.01ms !important;
+
+    }
+
+}
+
+
+/* BARBER QUEUE V2 modules */
+.bq-extra{border:1px solid rgba(120,156,255,.22);border-radius:20px;background:linear-gradient(145deg,rgba(18,24,40,.94),rgba(5,7,13,.95));padding:20px;margin:18px 0;box-shadow:0 20px 60px #0005, inset 0 1px #ffffff0a}
+.bq-extra h3{margin:0 0 8px;font-size:16px;color:#f5f7ff}.bq-muted{font-size:11px;color:#929bad;line-height:1.7}.bq-livegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.bq-livecell{padding:14px;border-radius:13px;background:#ffffff08;border:1px solid #ffffff0c}.bq-livecell b{display:block;font-size:24px;color:#9eb7ff;margin-top:8px}.bq-formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.bq-input{width:100%;padding:12px;border-radius:10px;background:#060810;color:#fff;border:1px solid #ffffff22;font:12px Inter,Arial}.bq-action{padding:12px 15px;border:0;border-radius:10px;background:linear-gradient(135deg,#dfe8ff,#8ca9ff);color:#060810;font-weight:900;font-size:10px;cursor:pointer}.bq-full{grid-column:1/-1}.bq-status{font-size:11px;color:#75e9b0;min-height:18px;margin-top:10px}@media(max-width:600px){.bq-livegrid{grid-template-columns:1fr}.bq-formgrid{grid-template-columns:1fr}}
+
+
+/* Separate customer journeys: ticket OR appointment */
+.bq-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 auto 30px;max-width:900px}
+.bq-entry-btn{position:relative;overflow:hidden;min-height:170px;text-align:left;padding:25px;border:1px solid #91aaff45;border-radius:22px;background:linear-gradient(145deg,#141a2c,#080a11);color:#f8faff;cursor:pointer;box-shadow:0 18px 55px #0007;transition:transform .25s,border-color .25s,box-shadow .25s}
+.bq-entry-btn:hover{transform:translateY(-5px);border-color:#61e7ffb0;box-shadow:0 20px 55px #477aff24}
+.bq-entry-btn strong{display:block;font-size:clamp(18px,3vw,25px);margin:16px 0 8px;letter-spacing:-.5px}
+.bq-entry-btn span{display:block;color:#aab4cb;font-size:12px;line-height:1.7}
+.bq-entry-icon{font-size:28px;color:#75eaff}
+.bq-flow-back{margin:0 0 16px;padding:10px 14px;border:1px solid #ffffff25;border-radius:10px;background:#ffffff09;color:#fff;cursor:pointer;font-weight:700}
+#services,#bqBooking,#bqLiveQueue{display:none}
+@media(max-width:600px){.bq-entry{grid-template-columns:1fr}.bq-entry-btn{min-height:135px}}
+
+
+
+/* QR-only customer entry gate */
+html.qr-required body > * {
+    display: none !important;
+}
+html.qr-required body::before {
+    content: var(--qr-gate-title, "ACCÈS CLIENT PAR QR CODE");
+    display: block;
+    position: fixed;
+    top: calc(50% - 56px);
+    left: 20px;
+    right: 20px;
+    color: #f7f7f8;
+    text-align: center;
+    font: 800 clamp(20px, 4vw, 30px)/1.3 Inter, Arial, sans-serif;
+    letter-spacing: .04em;
+    z-index: 999999;
+}
+html.qr-required body::after {
+    content: var(--qr-gate-subtitle, "Pour accéder au menu du salon, scannez le QR code affiché sur place.");
+    display: block;
+    position: fixed;
+    top: calc(50% + 4px);
+    left: 24px;
+    right: 24px;
+    color: #9ca3af;
+    text-align: center;
+    font: 500 14px/1.7 Inter, Arial, sans-serif;
+    z-index: 999999;
+}
+
+</style>
+
+
+<script>
+/* Secure QR gate: the token is validated by Supabase before the customer UI is revealed. */
+(() => {
+  document.documentElement.classList.add("qr-required");
+  const token = new URLSearchParams(window.location.search).get("qr");
+  if (!token) return;
+  document.documentElement.style.setProperty('--qr-gate-title', '"VÉRIFICATION DU QR CODE"');
+  document.documentElement.style.setProperty('--qr-gate-subtitle', '"Validation sécurisée en cours…"');
+})();
+</script>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     BACKGROUND
+========================================================= -->
+
+<div class="background">
+
+    <div class="grid"></div>
+
+    <div class="orb one"></div>
+
+    <div class="orb two"></div>
+
+    <div class="orb three"></div>
+
+    <div class="light"></div>
+
+
+    <div class="particles">
+
+        <span
+            class="particle"
+            style="left:7%;animation-duration:11s;animation-delay:-2s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:18%;animation-duration:14s;animation-delay:-6s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:31%;animation-duration:9s;animation-delay:-1s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:44%;animation-duration:13s;animation-delay:-8s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:58%;animation-duration:10s;animation-delay:-4s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:71%;animation-duration:15s;animation-delay:-9s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:84%;animation-duration:12s;animation-delay:-5s">
+        </span>
+
+        <span
+            class="particle"
+            style="left:94%;animation-duration:9s;animation-delay:-3s">
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     APP
+========================================================= -->
+
+<div class="container">
+
+
+    <!-- =====================================================
+         TOP BAR
+    ===================================================== -->
+
+    <div class="topbar">
+
+        <div class="identity">
+
+            <div class="logo">
+                BQ
+            </div>
+
+            <div>
+
+                <div class="brand">
+                    BARBER QUEUE
+                </div>
+
+                <div
+                    class="brand-sub"
+                    data-fr="DIGITAL QUEUE SYSTEM"
+                    data-ar="نظام الطابور الرقمي"
+                >
+                    DIGITAL QUEUE SYSTEM
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LANGUAGE -->
+
+        <div
+            class="language"
+            aria-label="Language selector"
+        >
+
+            <button
+                class="lang active"
+                id="frBtn"
+                onclick="changeLanguage('fr')"
+                type="button"
+            >
+                FR
+            </button>
+
+
+            <button
+                class="lang"
+                id="arBtn"
+                onclick="changeLanguage('ar')"
+                type="button"
+            >
+                AR
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         HERO
+    ===================================================== -->
+
+    <section class="hero">
+
+        <div
+            class="kicker"
+
+            data-fr="BIENVENUE"
+
+            data-ar="مرحباً بك"
+        >
+            BIENVENUE
+        </div>
+
+
+        <h1 class="hero-title">
+
+            <span
+                data-fr="Prenez votre"
+                data-ar="خذ"
+            >
+                Prenez votre
+            </span>
+
+            <span
+                data-fr="tour."
+                data-ar="دورك."
+            >
+                tour.
+            </span>
+
+        </h1>
+
+
+        <p
+            class="hero-description"
+
+            data-fr="Choisissez votre service et recevez votre numéro instantanément."
+
+            data-ar="اختر خدمتك واحصل على رقم الانتظار مباشرة."
+        >
+            Choisissez votre service et recevez votre numéro instantanément.
+        </p>
+
+    </section>
+
+
+    <section class="bq-entry" id="bqEntryChoice" aria-label="Choisir une option">
+      <button type="button" class="bq-entry-btn" onclick="openBqFlow('ticket')">
+        <div class="bq-entry-icon">01 / TICKET</div>
+        <strong>Prendre un ticket</strong>
+        <span>Choisissez Coupe, Barbe ou une autre prestation et rejoignez directement la file d’attente.</span>
+      </button>
+      <button type="button" class="bq-entry-btn" onclick="openBqFlow('appointment')">
+        <div class="bq-entry-icon">02 / BOOKING</div>
+        <strong>Prendre rendez-vous</strong>
+        <span>Remplissez le formulaire. Votre demande sera envoyée à l’administration pour confirmation.</span>
+      </button>
+    </section>
+
+    <!-- =====================================================
+         SERVICES CARD
+    ===================================================== -->
+
+    <section
+        class="card"
+        id="services"
+    >
+        <button class="bq-flow-back" type="button" data-bq-back aria-label="Retour à l’accueil">← Retour / Back</button>
+
+        <div class="card-content">
+
+
+            <div class="card-head">
+
+                <div>
+
+                    <div
+                        class="card-kicker"
+
+                        data-fr="SERVICES"
+
+                        data-ar="الخدمات"
+                    >
+                        SERVICES
+                    </div>
+
+
+                    <h2
+                        class="card-title"
+
+                        data-fr="Choisissez votre service"
+
+                        data-ar="اختر الخدمة"
+                    >
+                        Choisissez votre service
+                    </h2>
+
+
+                    <p
+                        class="card-description"
+
+                        data-fr="Sélectionnez une prestation pour prendre votre ticket."
+
+                        data-ar="اختر الخدمة للحصول على رقم الانتظار."
+                    >
+                        Sélectionnez une prestation pour prendre votre ticket.
+                    </p>
+
+                </div>
+
+
+                <div class="card-index">
+                    03
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SERVICES
+            ================================================= -->
+
+            <div class="bq-extra" id="bqCustomerInfo"><h3 data-fr="Carte fidélité (facultatif)" data-ar="بطاقة الوفاء (اختياري)">Carte fidélité (facultatif)</h3><p class="bq-muted" data-fr="Ajoutez votre numéro pour cumuler vos visites et points de fidélité." data-ar="أدخل رقمك لتجميع الزيارات ونقاط الوفاء.">Ajoutez votre numéro pour cumuler vos visites et points de fidélité.</p><input class="bq-input" id="bqCustomerPhone" type="tel" inputmode="tel" placeholder="Téléphone / رقم الهاتف" autocomplete="tel"></div>
+<div class="services">
+
+
+                <!-- COUPE -->
+
+                <button
+                    class="service"
+                    onclick="takeTicket('Coupe',this)"
+                    type="button"
+                >
+
+                    <div class="service-left">
+
+                        <div class="service-icon">
+                            C
+                        </div>
+
+
+                        <div>
+
+                            <div
+                                class="service-name"
+
+                                data-fr="Coupe"
+
+                                data-ar="حلاقة الشعر"
+                            >
+                                Coupe
+                            </div>
+
+
+                            <div
+                                class="service-small"
+
+                                data-fr="Coupe de cheveux"
+
+                                data-ar="قص الشعر"
+                            >
+                                Coupe de cheveux
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                </button>
+
+
+                <!-- BARBE -->
+
+                <button
+                    class="service"
+                    onclick="takeTicket('Barbe',this)"
+                    type="button"
+                >
+
+                    <div class="service-left">
+
+                        <div class="service-icon">
+                            B
+                        </div>
+
+
+                        <div>
+
+                            <div
+                                class="service-name"
+
+                                data-fr="Barbe"
+
+                                data-ar="اللحية"
+                            >
+                                Barbe
+                            </div>
+
+
+                            <div
+                                class="service-small"
+
+                                data-fr="Taille et finition"
+
+                                data-ar="تهذيب وتصفيف"
+                            >
+                                Taille et finition
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                </button>
+
+
+                <!-- COUPE + BARBE -->
+
+                <button
+                    class="service"
+                    onclick="takeTicket('Coupe + Barbe',this)"
+                    type="button"
+                >
+
+                    <div class="service-left">
+
+                        <div class="service-icon">
+                            CB
+                        </div>
+
+
+                        <div>
+
+                            <div
+                                class="service-name"
+
+                                data-fr="Coupe + Barbe"
+
+                                data-ar="حلاقة + لحية"
+                            >
+                                Coupe + Barbe
+                            </div>
+
+
+                            <div
+                                class="service-small"
+
+                                data-fr="Service complet"
+
+                                data-ar="الخدمة الكاملة"
+                            >
+                                Service complet
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                </button>
+
+            </div>
+
+
+            <!-- LOADING -->
+
+            <div
+                class="loading"
+                id="loading"
+            >
+
+                <span class="spinner"></span>
+
+                <span
+                    id="loadingText"
+                    data-fr="Création de votre ticket..."
+                    data-ar="جاري إنشاء رقمك..."
+                >
+                    Création de votre ticket...
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TICKET CARD
+    ===================================================== -->
+
+    
+<section class="bq-extra" id="bqLiveQueue"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="bq-muted" style="letter-spacing:2px;font-weight:800">LIVE QUEUE / FILE EN DIRECT</div><h3>Votre attente en temps réel</h3><p class="bq-muted">Les chiffres se mettent à jour automatiquement.</p></div><span class="live"><span class="live-dot"></span> LIVE</span></div><div class="bq-livegrid"><div class="bq-livecell"><span class="bq-muted">Ticket en service</span><b id="bqCurrentTicket">—</b></div><div class="bq-livecell"><span class="bq-muted">En attente</span><b id="bqWaitingCount">0</b></div><div class="bq-livecell"><span class="bq-muted">Attente estimée</span><b id="bqWaitEstimate">—</b></div></div></section>
+<section class="bq-extra" id="bqBooking"><button class="bq-flow-back" type="button" data-bq-back aria-label="Retour à l’accueil">← Retour / Back</button><div class="bq-muted" style="letter-spacing:2px;font-weight:800">BOOKING / RENDEZ-VOUS</div><h3>Réserver un créneau</h3><p class="bq-muted">Choisissez une prestation et proposez une date. Le salon confirmera le rendez-vous.</p><form id="bqBookingForm" class="bq-formgrid"><input class="bq-input" id="bqBookingName" placeholder="Nom / الاسم" required maxlength="80"><input class="bq-input" id="bqBookingPhone" type="tel" placeholder="Téléphone / الهاتف" required maxlength="30"><select class="bq-input" id="bqBookingService" required><option value="">Choisir un service</option></select><select class="bq-input" id="bqBookingBarber"><option value="">N'importe quel coiffeur</option></select><input class="bq-input" id="bqBookingDate" type="datetime-local" required><button class="bq-action bq-full" type="submit">DEMANDER UN RENDEZ-VOUS ↗</button><div class="bq-status bq-full" id="bqBookingMessage" role="status"></div></form></section>
+
+<section
+        class="card ticket-card"
+        id="ticket"
+    >
+
+        <div class="card-content">
+
+
+            <div class="ticket-top">
+
+                <div
+                    class="ticket-label"
+
+                    data-fr="VOTRE NUMÉRO"
+
+                    data-ar="رقمك"
+                >
+                    VOTRE NUMÉRO
+                </div>
+
+
+                <div class="live">
+
+                    <span class="live-dot"></span>
+
+                    LIVE
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="number"
+                id="ticketNumber"
+            >
+                A001
+            </div>
+
+
+            <div
+                class="service-badge"
+                id="serviceName"
+            >
+                Coupe
+            </div>
+
+
+            <div class="waiting-box">
+
+                <div
+                    class="waiting-title"
+
+                    data-fr="PERSONNES AVANT VOUS"
+
+                    data-ar="الأشخاص قبلك"
+                >
+                    PERSONNES AVANT VOUS
+                </div>
+
+
+                <div
+                    class="waiting-number"
+                    id="people"
+                >
+                    0
+                </div>
+
+
+                <div
+                    class="waiting-description"
+
+                    data-fr="Nous vous appellerons lorsque votre tour arrivera."
+
+                    data-ar="سننادي رقمك عندما يحين دورك."
+                >
+                    Nous vous appellerons lorsque votre tour arrivera.
+                </div>
+
+            </div>
+
+
+            <button
+                class="back-button"
+
+                onclick="resetTicket()"
+
+                data-fr="Prendre un autre ticket"
+
+                data-ar="أخذ رقم آخر"
+
+                type="button"
+            >
+                Prendre un autre ticket
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <div
+        class="footer"
+
+        data-fr="BARBER QUEUE · REALTIME MANAGEMENT"
+
+        data-ar="BARBER QUEUE · نظام الطابور المباشر"
+    >
+        BARBER QUEUE · REALTIME MANAGEMENT
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     SUPABASE
+========================================================= -->
+
+<script>
+
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
+
+const SUPABASE_URL =
+    "https://fuyxvhhisoajfwaghwiv.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_RC9oaIkUMVEZjgs9rCAWtg_2MmnaQpX";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+/* Keep the page hidden unless the supplied QR token is valid and unexpired in Supabase. */
+(async function validateSecureQrEntry(){
+    const root = document.documentElement;
+    const token = new URLSearchParams(window.location.search).get("qr");
+    const setGateMessage = (title, subtitle) => {
+        root.style.setProperty('--qr-gate-title', JSON.stringify(title));
+        root.style.setProperty('--qr-gate-subtitle', JSON.stringify(subtitle));
+    };
+    if (!token) {
+        setGateMessage('ACCÈS CLIENT PAR QR CODE', 'Scannez le QR code actif affiché dans le salon pour accéder au menu.');
+        return;
+    }
+    if (!/^[a-f0-9]{64}$/i.test(token)) {
+        setGateMessage('QR CODE INVALIDE', 'Ce lien ne correspond pas à un QR code valide. Scannez le code affiché dans le salon.');
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient.rpc('validate_barber_queue_qr_token', { p_token: token });
+        if (error) throw error;
+        if (data === true) {
+            root.classList.remove('qr-required');
+            root.style.removeProperty('--qr-gate-title');
+            root.style.removeProperty('--qr-gate-subtitle');
+        } else {
+            setGateMessage('QR CODE EXPIRÉ OU RÉVOQUÉ', 'Demandez un nouveau QR code au personnel du salon.');
+        }
+    } catch (error) {
+        console.error('Secure QR validation failed:', error);
+        setGateMessage('VÉRIFICATION IMPOSSIBLE', 'Connexion sécurisée indisponible. Réessayez ou demandez au personnel.');
+    }
+})();
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+let currentLanguage =
+    localStorage.getItem("barber-queue-language")
+    || "fr";
+
+
+function changeLanguage(language){
+
+    currentLanguage = language;
+
+
+    document.querySelectorAll(
+        "[data-fr]"
+    ).forEach(element => {
+
+        const text =
+            element.getAttribute(
+                "data-" + language
+            );
+
+        if(text !== null){
+
+            element.textContent = text;
+
+        }
+
+    });
+
+
+    document
+        .getElementById("frBtn")
+        .classList.toggle(
+            "active",
+            language === "fr"
+        );
+
+
+    document
+        .getElementById("arBtn")
+        .classList.toggle(
+            "active",
+            language === "ar"
+        );
+
+
+    document.body.classList.toggle(
+        "arabic",
+        language === "ar"
+    );
+
+
+    document.documentElement.lang =
+        language;
+
+
+    document.documentElement.dir =
+        language === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    localStorage.setItem(
+        "barber-queue-language",
+        language
+    );
+
+}
+
+
+/* =========================================================
+   TAKE TICKET
+   KEEPING SAME SUPABASE RPC
+========================================================= */
+
+function openBqFlow(flow){
+  const entry=document.getElementById('bqEntryChoice');
+  const services=document.getElementById('services');
+  const booking=document.getElementById('bqBooking');
+  const live=document.getElementById('bqLiveQueue');
+  if(entry)entry.style.display='none';
+  if(services)services.style.display=flow==='ticket'?'block':'none';
+  if(booking)booking.style.display=flow==='appointment'?'block':'none';
+  if(live)live.style.display=flow==='ticket'?'block':'none';
+  if(flow==='ticket'&&services)services.scrollIntoView({behavior:'smooth',block:'start'});
+  if(flow==='appointment'&&booking)booking.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function backBqHome(){
+  ['services','bqBooking','bqLiveQueue'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.setAttribute('aria-hidden','true')}});
+  const entry=document.getElementById('bqEntryChoice');if(entry){entry.style.display='grid';entry.removeAttribute('aria-hidden')}
+  const ticket=document.getElementById('ticket');if(ticket)ticket.style.display='none';
+  const bookingForm=document.getElementById('bqBookingForm');if(bookingForm)bookingForm.reset();
+  const bookingMessage=document.getElementById('bqBookingMessage');if(bookingMessage)bookingMessage.textContent='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.addEventListener('click',function(event){const back=event.target.closest('[data-bq-back]');if(back){event.preventDefault();backBqHome()}});
+
+
+async function takeTicket(
+    service,
+    button
+){
+
+    const buttons =
+        document.querySelectorAll(
+            ".service"
+        );
+
+
+    buttons.forEach(btn => {
+
+        btn.disabled = true;
+
+        btn.style.opacity = "0.45";
+
+    });
+
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+
+    loading.style.display =
+        "flex";
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "create_queue_ticket",
+                    {
+                        p_service: service,
+                        p_customer_phone: (document.getElementById("bqCustomerPhone")?.value || "").trim() || null
+                    }
+                );
+
+
+        if(error){
+
+            console.error(
+                "Ticket error:",
+                error
+            );
+
+
+            alert(
+
+                currentLanguage === "ar"
+
+                    ? "تعذر أخذ الرقم. حاول مرة أخرى."
+
+                    : "Impossible de prendre le ticket. Réessayez.\n\nDétail: " + (error.message || error.details || error.hint || "Erreur Supabase inconnue")
+
+            );
+
+
+            buttons.forEach(btn => {
+
+                btn.disabled = false;
+
+                btn.style.opacity = "1";
+
+            });
+
+
+            loading.style.display =
+                "none";
+
+
+            return;
+
+        }
+
+
+        // Remember this ticket so its queue position can be refreshed live.
+        try { localStorage.setItem("bq_last_ticket_id", data.id); } catch (_) {}
+
+        /* =============================================
+           SHOW TICKET
+        ============================================= */
+
+        document.getElementById(
+            "services"
+        ).style.display =
+            "none";
+
+
+        const ticket =
+            document.getElementById(
+                "ticket"
+            );
+
+
+        ticket.style.display =
+            "block";
+        const entryChoice=document.getElementById('bqEntryChoice');if(entryChoice)entryChoice.style.display='none';
+        const liveQueue=document.getElementById('bqLiveQueue');if(liveQueue)liveQueue.style.display='block';
+
+
+        /*
+         * Restart ticket animation
+         */
+
+        ticket.classList.remove(
+            "ticket-card"
+        );
+
+        void ticket.offsetWidth;
+
+        ticket.classList.add(
+            "ticket-card"
+        );
+
+
+        document.getElementById(
+            "ticketNumber"
+        ).textContent =
+            data.ticket_code;
+
+
+        document.getElementById(
+            "serviceName"
+        ).textContent =
+            data.service;
+
+
+        /* Position is recalculated from the database and kept live by Realtime. */
+        if (window.__bqRefreshPosition) await window.__bqRefreshPosition(data);
+
+
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Unexpected error:",
+            error
+        );
+
+
+        alert(
+
+            currentLanguage === "ar"
+
+                ? "حدث خطأ غير متوقع."
+
+                : "Une erreur inattendue est survenue."
+
+        );
+
+
+        buttons.forEach(btn => {
+
+            btn.disabled = false;
+
+            btn.style.opacity = "1";
+
+        });
+
+    }
+
+
+    loading.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   RESET TICKET
+========================================================= */
+
+function resetTicket(){
+
+    document.getElementById(
+        "ticket"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "services"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "loading"
+    ).style.display =
+        "none";
+
+
+    const buttons =
+        document.querySelectorAll(
+            ".service"
+        );
+
+
+    buttons.forEach(btn => {
+
+        btn.disabled = false;
+
+        btn.style.opacity = "1";
+
+    });
+
+}
+
+
+/* =========================================================
+   INITIAL LANGUAGE
+========================================================= */
+
+async function loadDynamicQueueCategories(){
+    const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();
+    if(error){console.warn("Queue services could not load",error.message);return}
+    const config=data?.config||{};
+    const services=Array.isArray(config.services)?config.services:[];
+    const host=document.querySelector("#services .services");if(!host)return;
+    const previous=host.dataset.servicesSignature||"";
+    const signature=JSON.stringify(services);
+    if(previous!==signature){
+      host.innerHTML="";
+      services.forEach((service,index)=>{
+        const clean=String(service?.name||"").trim();if(!clean)return;
+        const button=document.createElement("button");button.type="button";button.className="service dynamic-category";button.dataset.category=clean;
+        button.innerHTML='<div class="service-left"><div class="service-icon"></div><div><div class="service-name"></div><div class="service-small"></div></div></div><div class="arrow">→</div>';
+        button.querySelector(".service-icon").textContent=clean.slice(0,2).toUpperCase();
+        button.querySelector(".service-name").textContent=clean;
+        button.querySelector(".service-small").textContent=(Number(service.price)||0).toLocaleString("fr-DZ")+" DA"+(service.duration?" · "+service.duration+" min":"");
+        button.addEventListener("click",()=>takeTicket(clean,button));host.appendChild(button);
+      });
+      host.dataset.servicesSignature=signature;
+    }
+    const select=document.getElementById("bqBookingService");if(select){const val=select.value;select.innerHTML='<option value="">Choisir un service</option>'+services.map(s=>'<option value="'+String(s.name||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))+'">'+String(s.name||"")+' — '+(Number(s.price)||0)+' DA</option>').join("");if(services.some(s=>s.name===val))select.value=val;}
+    const barberSelect=document.getElementById("bqBookingBarber");if(barberSelect){const val=barberSelect.value;barberSelect.innerHTML='<option value="">N’importe quel coiffeur</option>'+(Array.isArray(config.barbers)?config.barbers:[]).map(b=>'<option value="'+String(b.name||b).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))+'">'+String(b.name||b)+'</option>').join("");if(val)barberSelect.value=val;}
+}
+
+changeLanguage(
+    currentLanguage
+);
+loadDynamicQueueCategories();
+setInterval(loadDynamicQueueCategories,10000);
+
+/* BARBER QUEUE: live public queue + live position for this browser's ticket */
+(function(){
+ const $=id=>document.getElementById(id);
+ let positionBusy=false;
+ async function refreshMyTicketPosition(ticketOverride){
+  if(positionBusy)return; positionBusy=true;
+  try{
+   const ticketId=ticketOverride?.id || localStorage.getItem('bq_last_ticket_id');
+   if(!ticketId)return;
+   const {data:mine,error:mineError}=await supabaseClient.from('queue_tickets').select('id,ticket_number,status,created_at').eq('id',ticketId).maybeSingle();
+   if(mineError)throw mineError;
+   const people=$('people'); if(!mine){if(people)people.textContent='—';return}
+   if(mine.status==='serving'){if(people)people.textContent='0';return}
+   if(mine.status==='done'){if(people)people.textContent='Terminé';return}
+   const dayStart=new Date(mine.created_at);dayStart.setHours(0,0,0,0);const dayEnd=new Date(dayStart);dayEnd.setDate(dayEnd.getDate()+1);const {count,error}=await supabaseClient.from('queue_tickets').select('id',{count:'exact',head:true}).eq('status','waiting').gte('created_at',dayStart.toISOString()).lt('created_at',dayEnd.toISOString()).lt('ticket_number',mine.ticket_number);
+   if(error)throw error;
+   if(people)people.textContent=String(count||0);
+  }catch(e){console.warn('Ticket position unavailable:',e.message)}finally{positionBusy=false}
+ }
+ window.__bqRefreshPosition=refreshMyTicketPosition;
+ async function refreshPublicQueue(){
+  try{
+   const [serving,waiting,settings]=await Promise.all([
+    supabaseClient.from('queue_tickets').select('ticket_code,service,chair,called_at').eq('status','serving').order('called_at',{ascending:false}).limit(20),
+    supabaseClient.from('queue_tickets').select('id',{count:'exact',head:true}).eq('status','waiting'),
+    supabaseClient.from('barber_queue_settings').select('config').eq('id',1).maybeSingle()
+   ]);
+   if(serving.error||waiting.error)throw serving.error||waiting.error;
+   const active=serving.data||[];if($('bqCurrentTicket'))$('bqCurrentTicket').textContent=active.length?active.map(x=>x.ticket_code).join(' · '):'—';
+   if($('bqWaitingCount'))$('bqWaitingCount').textContent=waiting.count||0;
+   const durations=(settings.data?.config?.services||[]).map(x=>Number(x.duration)||20);const avg=durations.length?durations.reduce((a,b)=>a+b,0)/durations.length:20;
+   if($('bqWaitEstimate'))$('bqWaitEstimate').textContent=(waiting.count?Math.ceil((waiting.count||0)*avg/Math.max(1,(settings.data?.config?.chairs||[]).length||3))+' min':'0 min');
+   await refreshMyTicketPosition();
+  }catch(e){console.warn('Live queue unavailable',e.message)}
+ }
+ const form=$('bqBookingForm');if(form)form.addEventListener('submit',async e=>{
+  e.preventDefault();const msg=$('bqBookingMessage');const when=new Date($('bqBookingDate').value);if(Number.isNaN(when.getTime())||when<=new Date()){msg.textContent='Choisissez une date future.';return}
+  const payload={customer_name:$('bqBookingName').value.trim(),customer_phone:$('bqBookingPhone').value.trim(),service:$('bqBookingService').value,barber_name:$('bqBookingBarber').value||null,appointment_at:when.toISOString(),status:'requested'};
+  const button=form.querySelector('button[type="submit"]');button.disabled=true;msg.textContent='Envoi de la demande…';
+  try{const {error}=await supabaseClient.from('queue_appointments').insert(payload);if(error)throw error;msg.textContent='Demande envoyée. Le salon doit confirmer le rendez-vous.';form.reset();}
+  catch(err){console.error('Booking error',err);msg.textContent='Réservation indisponible : '+err.message+' (vérifiez le SQL de synchronisation).'}finally{button.disabled=false}
+ });
+ refreshPublicQueue();setInterval(refreshPublicQueue,5000);
+ try{supabaseClient.channel('bq-public-live').on('postgres_changes',{event:'*',schema:'public',table:'queue_tickets'},()=>{refreshPublicQueue()}).subscribe(status=>console.log('Customer Realtime:',status))}catch(e){console.warn(e)}
+})();
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BARBER QUEUE — ADMIN</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root{
+    --bg:#020307;
+    --text:#f7f8fb;
+    --muted:#747d8b;
+    --dim:#414957;
+
+    --line:rgba(255,255,255,.07);
+
+    --blue:#789cff;
+    --cyan:#61e7ff;
+    --green:#55efa4;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    color:var(--text);
+    font-family:Inter,Arial,sans-serif;
+    background:#020307;
+    overflow-x:hidden;
+}
+
+/* =====================================================
+   CINEMATIC BACKGROUND
+===================================================== */
+
+.world{
+    position:fixed;
+    inset:0;
+    z-index:-10;
+    overflow:hidden;
+    pointer-events:none;
+    background:
+        radial-gradient(
+            ellipse at 50% -20%,
+            rgba(91,112,255,.16),
+            transparent 42%
+        ),
+        radial-gradient(
+            ellipse at 100% 100%,
+            rgba(0,210,255,.06),
+            transparent 35%
+        ),
+        #020307;
+}
+
+.world::before{
+    content:"";
+    position:absolute;
+
+    width:700px;
+    height:700px;
+
+    left:-350px;
+    top:-350px;
+
+    border-radius:50%;
+
+    background:#6274ff;
+
+    filter:blur(170px);
+
+    opacity:.12;
+
+    animation:
+        orbOne
+        15s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+.world::after{
+    content:"";
+    position:absolute;
+
+    width:600px;
+    height:600px;
+
+    right:-300px;
+    bottom:-300px;
+
+    border-radius:50%;
+
+    background:#00d9ff;
+
+    filter:blur(170px);
+
+    opacity:.075;
+
+    animation:
+        orbTwo
+        18s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+@keyframes orbOne{
+    to{
+        transform:
+            translate(150px,110px)
+            scale(1.18);
+    }
+}
+
+@keyframes orbTwo{
+    to{
+        transform:
+            translate(-120px,-100px)
+            scale(1.15);
+    }
+}
+
+.grid{
+    position:absolute;
+    inset:0;
+
+    opacity:.027;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.8) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.8) 1px,
+            transparent 1px
+        );
+
+    background-size:90px 90px;
+
+    mask-image:
+        radial-gradient(
+            ellipse at center,
+            black,
+            transparent 78%
+        );
+}
+
+.beam{
+    position:absolute;
+
+    width:1100px;
+    height:1px;
+
+    left:-900px;
+    top:38%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(100,140,255,0),
+            rgba(120,160,255,.55),
+            rgba(255,255,255,.85),
+            rgba(100,140,255,0),
+            transparent
+        );
+
+    transform:rotate(-18deg);
+
+    animation:
+        beamMove
+        10s
+        linear
+        infinite;
+
+    opacity:.28;
+}
+
+@keyframes beamMove{
+    from{
+        transform:
+            translateX(-500px)
+            rotate(-18deg);
+    }
+
+    to{
+        transform:
+            translateX(2700px)
+            rotate(-18deg);
+    }
+}
+
+.noise{
+    position:absolute;
+    inset:0;
+
+    opacity:.018;
+
+    background-image:
+        radial-gradient(
+            rgba(255,255,255,.8) .5px,
+            transparent .5px
+        );
+
+    background-size:5px 5px;
+}
+
+/* =====================================================
+   APP
+===================================================== */
+
+.app{
+    width:min(1500px,92%);
+    margin:auto;
+
+    padding:32px 0 55px;
+
+    animation:
+        appEnter
+        .8s
+        cubic-bezier(.2,.8,.2,1)
+        both;
+}
+
+@keyframes appEnter{
+    from{
+        opacity:0;
+        transform:
+            translateY(22px)
+            scale(.985);
+        filter:blur(4px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+        filter:none;
+    }
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    min-height:76px;
+
+    padding-bottom:24px;
+
+    border-bottom:
+        1px solid
+        var(--line);
+}
+
+.identity{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.mark{
+    position:relative;
+
+    width:51px;
+    height:51px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:16px;
+
+    color:#05070a;
+
+    font-family:"Space Grotesk";
+    font-size:14px;
+    font-weight:700;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #ccd8ff
+        );
+
+    box-shadow:
+        0 16px 45px rgba(105,135,255,.16);
+}
+
+.mark::after{
+    content:"";
+
+    position:absolute;
+    inset:-1px;
+
+    border-radius:inherit;
+
+    border:1px solid
+        rgba(255,255,255,.3);
+
+    opacity:.5;
+}
+
+.brand{
+    font-family:"Space Grotesk";
+
+    font-size:18px;
+    font-weight:700;
+
+    letter-spacing:-.5px;
+}
+
+.brand-sub{
+    margin-top:4px;
+
+    color:#525b69;
+
+    font-size:7px;
+    font-weight:700;
+
+    letter-spacing:2.6px;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.system{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px 15px;
+
+    border:
+        1px solid
+        rgba(85,239,164,.13);
+
+    border-radius:999px;
+
+    background:
+        rgba(85,239,164,.025);
+
+    color:#7d9187;
+
+    font-size:8px;
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    box-shadow:
+        inset 0 1px
+        rgba(255,255,255,.025);
+}
+
+.system-dot{
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 16px
+        var(--green);
+
+    animation:
+        systemPulse
+        2s
+        infinite;
+}
+
+@keyframes systemPulse{
+    50%{
+        opacity:.3;
+        transform:scale(.75);
+    }
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+
+    padding:
+        47px
+        0
+        27px;
+}
+
+.kicker{
+    margin-bottom:11px;
+
+    color:#555e6c;
+
+    font-size:7px;
+    font-weight:800;
+
+    letter-spacing:3.5px;
+}
+
+.title{
+    font-family:"Space Grotesk";
+
+    font-size:
+        clamp(37px,4.3vw,61px);
+
+    line-height:.94;
+
+    letter-spacing:-3.5px;
+
+    font-weight:700;
+}
+
+.title span{
+    color:#687281;
+}
+
+.description{
+    max-width:470px;
+
+    margin-top:14px;
+
+    color:#656e7b;
+
+    font-size:10px;
+
+    line-height:1.75;
+}
+
+.hero-meta{
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+
+    color:#444c59;
+
+    font-size:7px;
+    font-weight:700;
+
+    letter-spacing:1.5px;
+}
+
+.hero-meta::before{
+    content:"";
+
+    width:32px;
+    height:1px;
+
+    margin-bottom:3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #596579
+        );
+}
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:11px;
+
+    margin-bottom:18px;
+}
+
+.stat{
+    position:relative;
+
+    min-height:104px;
+
+    padding:19px 21px;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        rgba(255,255,255,.065);
+
+    border-radius:19px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.01)
+        );
+
+    box-shadow:
+        inset 0 1px
+        rgba(255,255,255,.025);
+
+    transition:
+        transform .35s
+        cubic-bezier(.2,.8,.2,1),
+        border-color .3s,
+        box-shadow .3s;
+}
+
+.stat::before{
+    content:"";
+
+    position:absolute;
+
+    width:130px;
+    height:130px;
+
+    right:-75px;
+    top:-85px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(120,150,255,.12),
+            transparent 70%
+        );
+
+    filter:blur(15px);
+}
+
+.stat:hover{
+    transform:translateY(-4px);
+
+    border-color:
+        rgba(255,255,255,.13);
+
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,.22),
+
+        inset 0 1px
+        rgba(255,255,255,.04);
+}
+
+.stat-label{
+    position:relative;
+    z-index:2;
+
+    color:#505967;
+
+    font-size:7px;
+    font-weight:800;
+
+    letter-spacing:2px;
+}
+
+.stat-value{
+    position:relative;
+    z-index:2;
+
+    margin-top:9px;
+
+    font-family:"Space Grotesk";
+
+    font-size:34px;
+    font-weight:700;
+
+    line-height:1;
+
+    letter-spacing:-2px;
+}
+
+/* =====================================================
+   MAIN GRID
+===================================================== */
+
+.main-grid{
+    display:grid;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        345px;
+
+    gap:14px;
+}
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.panel{
+    position:relative;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(14,17,24,.9),
+            rgba(5,7,11,.93)
+        );
+
+    box-shadow:
+        0 35px 100px
+        rgba(0,0,0,.35),
+
+        inset 0 1px
+        rgba(255,255,255,.035);
+
+    backdrop-filter:blur(28px);
+}
+
+.panel::before{
+    content:"";
+
+    position:absolute;
+
+    width:320px;
+    height:320px;
+
+    left:-190px;
+    top:-210px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(105,135,255,.095),
+            transparent 70%
+        );
+
+    filter:blur(30px);
+
+    animation:
+        panelGlow
+        9s
+        ease-in-out
+        infinite
+        alternate;
+
+    pointer-events:none;
+}
+
+@keyframes panelGlow{
+    to{
+        transform:
+            translate(300px,180px)
+            scale(1.15);
+    }
+}
+
+.panel-header{
+    position:relative;
+    z-index:3;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    min-height:68px;
+
+    padding:17px 20px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.05);
+}
+
+.panel-title{
+    font-family:"Space Grotesk";
+
+    font-size:11px;
+    font-weight:700;
+
+    letter-spacing:-.1px;
+}
+
+.panel-sub{
+    margin-top:4px;
+
+    color:#525b68;
+
+    font-size:7px;
+}
+
+.panel-tag{
+    padding:6px 9px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.055);
+
+    border-radius:8px;
+
+    color:#4f5866;
+
+    background:
+        rgba(255,255,255,.018);
+
+    font-size:6px;
+    font-weight:800;
+
+    letter-spacing:1.5px;
+}
+
+/* =====================================================
+   STATIONS
+===================================================== */
+
+.stations{
+    position:relative;
+    z-index:2;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:10px;
+
+    padding:13px;
+}
+
+.chair-card{
+    position:relative;
+
+    min-width:0;
+
+    padding:15px;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius:19px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.038),
+            rgba(255,255,255,.008)
+        );
+
+    transition:
+        transform .4s
+        cubic-bezier(.2,.8,.2,1),
+        border-color .35s,
+        box-shadow .35s;
+}
+
+.chair-card:hover{
+    transform:translateY(-5px);
+
+    border-color:
+        rgba(115,145,255,.19);
+
+    box-shadow:
+        0 20px 55px
+        rgba(0,0,0,.28);
+}
+
+.chair-card.busy{
+    border-color:
+        rgba(85,239,164,.23);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,43,34,.34),
+            rgba(7,11,10,.86)
+        );
+
+    box-shadow:
+        inset 0 0 60px
+        rgba(85,239,164,.025);
+}
+
+.chair-card.busy::before{
+    content:"";
+
+    position:absolute;
+
+    width:190px;
+    height:190px;
+
+    left:50%;
+    top:22%;
+
+    transform:
+        translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:
+        rgba(85,239,164,.07);
+
+    filter:blur(48px);
+
+    pointer-events:none;
+}
+
+/* =====================================================
+   STATION HEADER
+===================================================== */
+
+.station-top{
+    position:relative;
+    z-index:3;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+.chair-title{
+    color:#858e9d;
+
+    font-family:"Space Grotesk";
+
+    font-size:8px;
+    font-weight:700;
+
+    letter-spacing:1.8px;
+}
+
+.station-state{
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    color:#424a57;
+
+    font-size:6px;
+    font-weight:800;
+
+    letter-spacing:1px;
+}
+
+.station-state::before{
+    content:"";
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#3c434f;
+}
+
+.chair-card.busy .station-state{
+    color:var(--green);
+}
+
+.chair-card.busy .station-state::before{
+    background:var(--green);
+
+    box-shadow:
+        0 0 11px
+        var(--green);
+
+    animation:
+        busyPulse
+        1.8s
+        infinite;
+}
+
+@keyframes busyPulse{
+    50%{
+        opacity:.35;
+    }
+}
+
+/* =====================================================
+   TICKET DISPLAY
+===================================================== */
+
+.ticket{
+    position:relative;
+    z-index:2;
+
+    height:139px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        rgba(255,255,255,.05);
+
+    border-radius:16px;
+
+    background:
+        radial-gradient(
+            circle at 50% 48%,
+            rgba(110,140,255,.085),
+            transparent 67%
+        ),
+        rgba(0,0,0,.17);
+
+    box-shadow:
+        inset 0 1px
+        rgba(255,255,255,.025);
+}
+
+.ticket::before{
+    content:"ACTIVE TICKET";
+
+    position:absolute;
+
+    top:10px;
+    left:11px;
+
+    color:#363e4a;
+
+    font-size:5px;
+    font-weight:800;
+
+    letter-spacing:1.8px;
+}
+
+.ticket::after{
+    content:"";
+
+    position:absolute;
+
+    left:14%;
+    right:14%;
+    bottom:11px;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.085),
+            transparent
+        );
+}
+
+.chair-number{
+    font-family:"Space Grotesk";
+
+    font-size:52px;
+
+    line-height:1;
+
+    font-weight:700;
+
+    letter-spacing:-4px;
+
+    color:#d8dde6;
+
+    text-shadow:
+        0 0 25px
+        rgba(255,255,255,.04);
+
+    transition:
+        color .35s,
+        text-shadow .35s,
+        transform .35s;
+}
+
+.chair-card.busy .chair-number{
+    color:#edfff6;
+
+    text-shadow:
+        0 0 32px
+        rgba(85,239,164,.16);
+
+    animation:
+        ticketGlow
+        3s
+        ease-in-out
+        infinite;
+}
+
+@keyframes ticketGlow{
+    50%{
+        transform:scale(1.025);
+        text-shadow:
+            0 0 42px
+            rgba(85,239,164,.22);
+    }
+}
+
+.chair-service{
+    position:relative;
+    z-index:3;
+
+    min-height:16px;
+
+    margin-top:11px;
+
+    text-align:center;
+
+    color:#aeb6c2;
+
+    font-size:8px;
+    font-weight:600;
+}
+
+.chair-status{
+    position:relative;
+    z-index:3;
+
+    min-height:12px;
+
+    margin-top:3px;
+
+    text-align:center;
+
+    color:#535c69;
+
+    font-size:6px;
+}
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.chair-actions{
+    position:relative;
+    z-index:5;
+
+    display:grid;
+    gap:7px;
+
+    margin-top:14px;
+}
+
+.call-button{
+    position:relative;
+
+    width:100%;
+    height:48px;
+
+    overflow:hidden;
+
+    border:0;
+    border-radius:13px;
+
+    color:#05070a;
+
+    background:
+        linear-gradient(
+            115deg,
+            #ffffff,
+            #d6e1ff,
+            #ffffff
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(100,135,255,.12),
+
+        inset 0 1px
+        rgba(255,255,255,.95);
+
+    font-size:8px;
+    font-weight:800;
+
+    letter-spacing:.8px;
+
+    cursor:pointer;
+
+    transition:
+        transform .25s,
+        filter .3s,
+        box-shadow .3s;
+}
+
+.call-button::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    bottom:0;
+
+    left:-110%;
+
+    width:65%;
+
+    background:
+        linear-gradient(
+            100deg,
+            transparent,
+            rgba(255,255,255,.95),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        callShine
+        3.6s
+        infinite;
+}
+
+@keyframes callShine{
+    0%,45%{
+        left:-110%;
+    }
+
+    74%,100%{
+        left:145%;
+    }
+}
+
+.call-button:hover:not(:disabled){
+    transform:translateY(-3px);
+
+    filter:brightness(1.06);
+
+    box-shadow:
+        0 17px 42px
+        rgba(100,140,255,.25),
+
+        0 0 25px
+        rgba(100,140,255,.07);
+}
+
+.call-button:active:not(:disabled){
+    transform:scale(.975);
+}
+
+.call-button:disabled{
+    opacity:.38;
+
+    cursor:not-allowed;
+
+    filter:saturate(.35);
+
+    box-shadow:none;
+}
+
+.chair-card.busy .call-button{
+    color:#06120c;
+
+    background:
+        linear-gradient(
+            115deg,
+            #48e096,
+            #baffdc,
+            #48e096
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(85,239,164,.08);
+}
+
+.finish{
+    width:100%;
+    height:34px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.055);
+
+    border-radius:11px;
+
+    color:#68717e;
+
+    background:
+        rgba(255,255,255,.022);
+
+    font-size:7px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:
+        background .25s,
+        color .25s,
+        border-color .25s,
+        transform .25s;
+}
+
+.finish:hover:not(:disabled){
+    color:#f2f4f7;
+
+    background:
+        rgba(255,255,255,.065);
+
+    border-color:
+        rgba(255,255,255,.13);
+
+    transform:translateY(-1px);
+}
+
+.finish:disabled{
+    opacity:.22;
+
+    cursor:not-allowed;
+}
+
+/* =====================================================
+   QUEUE
+===================================================== */
+
+.queue{
+    position:relative;
+    z-index:2;
+
+    padding:12px;
+
+    max-height:499px;
+
+    overflow-y:auto;
+}
+
+.queue::-webkit-scrollbar{
+    width:3px;
+}
+
+.queue::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.queue::-webkit-scrollbar-thumb{
+    background:#252b35;
+    border-radius:10px;
+}
+
+.queue-item{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    min-height:66px;
+
+    padding:
+        10px
+        11px
+        10px
+        16px;
+
+    margin-bottom:7px;
+
+    overflow:hidden;
+
+    border:
+        1px solid
+        rgba(255,255,255,.05);
+
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(255,255,255,.04),
+            rgba(255,255,255,.01)
+        );
+
+    animation:
+        queueEnter
+        .4s
+        cubic-bezier(.2,.8,.2,1)
+        both;
+
+    transition:
+        transform .3s,
+        border-color .3s,
+        background .3s;
+}
+
+.queue-item:last-child{
+    margin-bottom:0;
+}
+
+.queue-item:hover{
+    transform:translateX(4px);
+
+    border-color:
+        rgba(120,150,255,.18);
+
+    background:
+        rgba(255,255,255,.055);
+}
+
+.queue-item::before{
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    top:12px;
+    bottom:12px;
+
+    width:2px;
+
+    border-radius:4px;
+
+    background:#789eff;
+
+    box-shadow:
+        0 0 13px
+        rgba(120,158,255,.42);
+}
+
+@keyframes queueEnter{
+    from{
+        opacity:0;
+        transform:
+            translateY(8px)
+            scale(.985);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.queue-number{
+    font-family:"Space Grotesk";
+
+    font-size:16px;
+    font-weight:700;
+
+    letter-spacing:-.4px;
+}
+
+.queue-service{
+    margin-top:3px;
+
+    color:#5d6674;
+
+    font-size:6px;
+    font-weight:600;
+}
+
+.queue-position{
+    width:29px;
+    height:29px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius:9px;
+
+    color:#87909f;
+
+    background:
+        rgba(255,255,255,.03);
+
+    font-size:7px;
+    font-weight:800;
+}
+
+.empty{
+    min-height:205px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:25px;
+
+    border:
+        1px dashed
+        rgba(255,255,255,.065);
+
+    border-radius:14px;
+
+    color:#4b5461;
+
+    text-align:center;
+
+    font-size:8px;
+    font-weight:600;
+
+    animation:
+        emptyPulse
+        3s
+        ease-in-out
+        infinite;
+}
+
+@keyframes emptyPulse{
+    50%{
+        border-color:
+            rgba(255,255,255,.10);
+    }
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding-top:19px;
+
+    color:#383f4b;
+
+    font-size:6px;
+    font-weight:800;
+
+    letter-spacing:2.5px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1150px){
+
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+
+    .queue{
+        max-height:360px;
+    }
+}
+
+@media(max-width:850px){
+
+    .app{
+        width:94%;
+        padding-top:22px;
+    }
+
+    .hero{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:20px;
+    }
+
+    .hero-meta{
+        display:none;
+    }
+
+    .stations{
+        grid-template-columns:1fr;
+    }
+
+    .chair-card{
+        padding:17px;
+    }
+
+    .ticket{
+        height:145px;
+    }
+}
+
+@media(max-width:620px){
+
+    .header{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .header-right{
+        width:100%;
+    }
+
+    .system{
+        width:100%;
+        justify-content:center;
+    }
+
+    .hero{
+        padding-top:35px;
+    }
+
+    .title{
+        letter-spacing:-2.5px;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .footer{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:8px;
+    }
+}
+
+@media(max-width:400px){
+
+    .app{
+        width:95%;
+    }
+
+    .brand{
+        font-size:16px;
+    }
+
+    .title{
+        font-size:34px;
+    }
+
+    .panel{
+        border-radius:20px;
+    }
+
+    .panel-header{
+        padding:16px;
+    }
+
+    .stations{
+        padding:9px;
+    }
+
+    .chair-card{
+        border-radius:17px;
+    }
+}
+
+
+.dashboard-link{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border-radius:12px;border:1px solid rgba(120,156,255,.28);color:#eef2ff;text-decoration:none;font-size:9px;font-weight:800;letter-spacing:.8px;background:linear-gradient(135deg,rgba(120,156,255,.18),rgba(97,231,255,.06));transition:.25s}
+.dashboard-link:hover{transform:translateY(-2px);border-color:rgba(120,156,255,.6)}
+@media(max-width:600px){.header-right{flex-wrap:wrap;justify-content:flex-end}.dashboard-link{font-size:8px;padding:9px 10px}}
+
+
+.appointment-panel{margin:22px 0;padding:22px;border:1px solid #61e7ff30;border-radius:20px;background:linear-gradient(145deg,#111827ee,#070910ee);box-shadow:0 15px 50px #0005}
+.appointment-panel h2{margin:0 0 6px;font-size:18px}.appointment-panel .sub{color:#8e9bb2;font-size:11px;margin-bottom:16px}
+.appointment-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.appointment-card{border:1px solid #ffffff18;border-radius:15px;padding:15px;background:#ffffff06;display:flex;flex-direction:column;gap:8px;min-width:0}
+.appointment-card .appt-time{color:#61e7ff;font-weight:800;font-size:12px}.appointment-card .appt-name{font-size:16px;font-weight:800}.appointment-card .appt-meta{font-size:11px;color:#9ca8bd;line-height:1.7}.appt-station-button{width:100%;margin-top:8px;border:1px solid #61e7ff50;border-radius:10px;padding:10px;background:#61e7ff10;color:#a9f2ff;font-size:10px;font-weight:900;letter-spacing:.5px;cursor:pointer}
+.appointment-card .appt-call{border:0;border-radius:10px;padding:12px;background:linear-gradient(120deg,#c8f7ff,#7da2ff);font-weight:900;color:#080b12;cursor:pointer}
+
+</style>
+</head>
+
+<body>
+
+<div class="world">
+    <div class="grid"></div>
+    <div class="noise"></div>
+    <div class="beam"></div>
+</div>
+
+<div class="app">
+
+<header class="header">
+
+    <div class="identity">
+
+        <div class="mark">
+            BQ
+        </div>
+
+        <div>
+
+            <div class="brand">
+                BARBER QUEUE
+            </div>
+
+            <div class="brand-sub">
+                ADMINISTRATION SYSTEM
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="header-right">
+        <a class="dashboard-link" href="dashboard.html">↗ ANALYTICS PRO — PROFITS & STATS</a>
+
+        <div class="system">
+
+            <span class="system-dot"></span>
+
+            SYSTÈME ACTIF
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <div>
+
+        <div class="kicker">
+            CONTROL CENTER
+        </div>
+
+        <h1 class="title">
+            Gestion <span>en temps réel.</span>
+        </h1>
+
+        <p class="description">
+            Contrôlez les postes, appelez les prochains clients
+            et suivez la file d'attente depuis une seule interface.
+        </p>
+
+    </div>
+
+    <div class="hero-meta">
+        LIVE OPERATIONS
+    </div>
+
+</section>
+
+
+<section class="stats">
+
+    <div class="stat">
+
+        <div class="stat-label">
+            FILE D'ATTENTE
+        </div>
+
+        <div
+            class="stat-value"
+            id="waitingCount"
+        >
+            0
+        </div>
+
+    </div>
+
+    <div class="stat">
+
+        <div class="stat-label">
+            EN SERVICE
+        </div>
+
+        <div
+            class="stat-value"
+            id="currentStat"
+        >
+            0
+        </div>
+
+    </div>
+
+    <div class="stat">
+
+        <div class="stat-label">
+            CLIENTS SERVIS
+        </div>
+
+        <div
+            class="stat-value"
+            id="servedCount"
+        >
+            0
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="main-grid">
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <div class="panel-title">
+                Postes de travail
+            </div>
+
+            <div class="panel-sub">
+                État des trois postes
+            </div>
+
+        </div>
+
+        <div class="panel-tag">
+            LIVE / 03
+        </div>
+
+    </div>
+
+
+    <div class="stations">
+
+
+        <article
+            class="chair-card"
+            id="chair-card-1"
+        >
+
+            <div class="station-top">
+
+                <div class="chair-title">
+                    POSTE 01
+                </div>
+
+                <div class="station-state">
+                    LIBRE
+                </div>
+
+            </div>
+
+            <div class="ticket">
+
+                <div
+                    class="chair-number"
+                    id="chair-number-1"
+                >
+                    —
+                </div>
+
+            </div>
+
+            <div
+                class="chair-service"
+                id="chair-service-1"
+            >
+                Libre
+            </div>
+
+            <div
+                class="chair-status"
+                id="chair-status-1"
+            >
+                Aucun client
+            </div>
+            <div class="station-appointment" id="station-appointment-1" style="display:none;margin:12px 0;padding:12px;border:1px solid #61e7ff55;border-radius:12px;background:#61e7ff0b">
+              <div style="font-size:10px;letter-spacing:1px;color:#61e7ff;font-weight:900;margin-bottom:6px">RENDEZ-VOUS EN COURS</div>
+              <div class="station-appointment-details" id="station-appointment-details-1"></div>
+              <button class="appt-station-button" id="finish-appointment-button-1" onclick="finishAppointment(1)" type="button">TERMINER LE RENDEZ-VOUS</button>
+            </div>
+
+            <div class="chair-actions">
+
+                <button
+                    class="call-button"
+                    id="call-button-1"
+                    onclick="callNext(1)"
+                >
+                    APPELER LE SUIVANT
+                </button>
+
+                <button class="appt-station-button" id="call-appointment-button-1" onclick="callNextAppointment(1)">APPELER RENDEZ-VOUS</button>
+                <button
+                    class="finish"
+                    id="finish-button-1"
+                    onclick="finishClient(1)"
+                    disabled
+                >
+                    Terminer le client
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <article
+            class="chair-card"
+            id="chair-card-2"
+        >
+
+            <div class="station-top">
+
+                <div class="chair-title">
+                    POSTE 02
+                </div>
+
+                <div class="station-state">
+                    LIBRE
+                </div>
+
+            </div>
+
+            <div class="ticket">
+
+                <div
+                    class="chair-number"
+                    id="chair-number-2"
+                >
+                    —
+                </div>
+
+            </div>
+
+            <div
+                class="chair-service"
+                id="chair-service-2"
+            >
+                Libre
+            </div>
+
+            <div
+                class="chair-status"
+                id="chair-status-2"
+            >
+                Aucun client
+            </div>
+
+            <div class="chair-actions">
+
+                <button
+                    class="call-button"
+                    id="call-button-2"
+                    onclick="callNext(2)"
+                >
+                    APPELER LE SUIVANT
+                </button>
+
+                <button
+                    class="finish"
+                    id="finish-button-2"
+                    onclick="finishClient(2)"
+                    disabled
+                >
+                    Terminer le client
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <article
+            class="chair-card"
+            id="chair-card-3"
+        >
+
+            <div class="station-top">
+
+                <div class="chair-title">
+                    POSTE 03
+                </div>
+
+                <div class="station-state">
+                    LIBRE
+                </div>
+
+            </div>
+
+            <div class="ticket">
+
+                <div
+                    class="chair-number"
+                    id="chair-number-3"
+                >
+                    —
+                </div>
+
+            </div>
+
+            <div
+                class="chair-service"
+                id="chair-service-3"
+            >
+                Libre
+            </div>
+
+            <div
+                class="chair-status"
+                id="chair-status-3"
+            >
+                Aucun client
+            </div>
+
+            <div class="chair-actions">
+
+                <button
+                    class="call-button"
+                    id="call-button-3"
+                    onclick="callNext(3)"
+                >
+                    APPELER LE SUIVANT
+                </button>
+
+                <button
+                    class="finish"
+                    id="finish-button-3"
+                    onclick="finishClient(3)"
+                    disabled
+                >
+                    Terminer le client
+                </button>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <div class="panel-title">
+                File d'attente
+            </div>
+
+            <div class="panel-sub">
+                Prochains clients
+            </div>
+
+        </div>
+
+        <div class="panel-tag">
+            LIVE
+        </div>
+
+    </div>
+
+    <div
+        class="queue"
+        id="queue"
+    >
+
+        <div class="empty">
+            Chargement...
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+<section class="appointment-panel" id="confirmedAppointmentsPanel">
+  <h2>RENDEZ-VOUS CONFIRMÉS</h2>
+  <div class="sub">Section séparée des tickets. Les rendez-vous confirmés par l’administration apparaissent ici en direct.</div>
+  <div class="appointment-list" id="confirmedAppointmentsList"><div class="appointment-card">Chargement des rendez-vous…</div></div>
+</section>
+
+<footer class="footer">
+
+    <span>
+        BARBER QUEUE
+    </span>
+
+    <span>
+        REALTIME MANAGEMENT
+    </span>
+
+</footer>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://fuyxvhhisoajfwaghwiv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_RC9oaIkUMVEZjgs9rCAWtg_2MmnaQpX";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+let adminChairNames=["Poste 1","Poste 2","Poste 3"],adminChairsBuilt=false;
+function buildAdminChairs(names){
+    const host=document.querySelector(".stations");
+    if(!host)return;
+    const template=document.getElementById("chair-card-1").cloneNode(true);
+    host.innerHTML="";
+    adminChairNames=(names&&names.length?names:["Poste 1","Poste 2","Poste 3"]).slice();
+    adminChairNames.forEach((name,index)=>{
+        const n=index+1,card=template.cloneNode(true);
+        card.innerHTML=card.innerHTML.replace(/(chair-card|chair-number|chair-service|chair-status|station-appointment|station-appointment-details|finish-appointment-button|call-button|call-appointment-button|finish-button)-1\b/g,"$1-"+n).replace(/callNext\(1\)/g,"callNext("+n+")").replace(/callNextAppointment\(1\)/g,"callNextAppointment("+n+")").replace(/finishClient\(1\)/g,"finishClient("+n+")").replace(/finishAppointment\(1\)/g,"finishAppointment("+n+")");
+        card.id="chair-card-"+n;
+        const title=card.querySelector(".chair-title");if(title)title.textContent=String(name);
+        host.appendChild(card);
+    });
+    const live=document.querySelector(".station-live");if(live)live.textContent="LIVE / "+String(adminChairNames.length).padStart(2,"0");
+}
+async function loadAdminSettings(){
+    const {data,error}=await supabaseClient.from("barber_queue_settings").select("config").eq("id",1).maybeSingle();
+    if(error){console.warn("Settings table unavailable; using three default posts",error.message);buildAdminChairs(adminChairNames);adminChairsBuilt=true;return false}
+    const names=Array.isArray(data?.config?.chairs)&&data.config.chairs.length?data.config.chairs:adminChairNames;
+    if(!adminChairsBuilt||JSON.stringify(names)!==JSON.stringify(adminChairNames)){buildAdminChairs(names);adminChairsBuilt=true;return true}
+    return false;
+}
+
+
+async function loadQueue(){
+
+    const {data,error} =
+        await supabaseClient
+            .from("queue_tickets")
+            .select("id,ticket_number,ticket_code,service,status,chair,created_at,called_at,price_da")
+            .eq("status","waiting")
+            .gte("created_at", new Date(new Date().setHours(0,0,0,0)).toISOString())
+            .lt("created_at", new Date(new Date(new Date().setHours(0,0,0,0)).setDate(new Date().getDate()+1)).toISOString())
+            .order("ticket_number",{
+                ascending:true
+            });
+
+    if(error){
+
+        console.error(
+            "Erreur queue:",
+            error
+        );
+
+        document.getElementById("queue").innerHTML =
+            '<div class="empty">Erreur de connexion</div>';
+
+        return;
+    }
+
+    const queue =
+        document.getElementById("queue");
+
+    queue.innerHTML = "";
+
+    if(!data || data.length === 0){
+
+        queue.innerHTML =
+            '<div class="empty">Aucun client en attente</div>';
+
+        return;
+    }
+
+    data.forEach((ticket,index)=>{
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "queue-item";
+
+        item.innerHTML = `
+
+            <div>
+
+                <div class="queue-number">
+                    ${ticket.ticket_code}
+                </div>
+
+                <div class="queue-service">
+                    ${ticket.service}
+                </div>
+
+            </div>
+
+            <div class="queue-position">
+                #${index + 1}
+            </div>
+
+        `;
+
+        queue.appendChild(item);
+
+    });
+
+}
+
+
+async function loadCurrentClients(){
+
+    const {data,error} =
+        await supabaseClient
+            .from("queue_tickets")
+            .select("id,ticket_number,ticket_code,service,status,chair,created_at,called_at,price_da")
+            .eq("status","serving")
+            .order("called_at",{
+                ascending:false
+            });
+
+    if(error){
+
+        console.error(
+            "Erreur postes:",
+            error
+        );
+
+        return;
+    }
+
+    for(let chair=1;chair<=adminChairNames.length;chair++){
+
+        document.getElementById(
+            `chair-number-${chair}`
+        ).textContent="—";
+
+        document.getElementById(
+            `chair-service-${chair}`
+        ).textContent="Libre";
+
+        document.getElementById(
+            `chair-status-${chair}`
+        ).textContent="Aucun client";
+
+        document.getElementById(
+            `chair-card-${chair}`
+        ).classList.remove("busy");
+
+        document.getElementById(
+            `call-button-${chair}`
+        ).disabled=false;
+
+        document.getElementById(
+            `call-button-${chair}`
+        ).textContent=
+            "APPELER LE SUIVANT";
+
+        document.getElementById(
+            `finish-button-${chair}`
+        ).disabled=true;
+    }
+
+    (data || []).forEach(client=>{
+
+        const chair =
+            Number(client.chair);
+
+        if(!Number.isInteger(chair)||chair<1||chair>adminChairNames.length){
+            return;
+        }
+
+        document.getElementById(
+            `chair-number-${chair}`
+        ).textContent =
+            client.ticket_code;
+
+        document.getElementById(
+            `chair-service-${chair}`
+        ).textContent =
+            client.service;
+
+        document.getElementById(
+            `chair-status-${chair}`
+        ).textContent =
+            "Client en service";
+
+        document.getElementById(
+            `chair-card-${chair}`
+        ).classList.add("busy");
+
+        document.getElementById(
+            `call-button-${chair}`
+        ).disabled=true;
+
+        document.getElementById(
+            `call-button-${chair}`
+        ).textContent=
+            "CLIENT EN SERVICE";
+
+        document.getElementById(
+            `finish-button-${chair}`
+        ).disabled=false;
+    });
+
+    document.getElementById(
+        "currentStat"
+    ).textContent =
+        data ? data.length : 0;
+}
+
+
+async function loadStats(){
+
+    const {
+        count:waiting,
+        error:waitingError
+    } =
+        await supabaseClient
+            .from("queue_tickets")
+            .select("*",{
+                count:"exact",
+                head:true
+            })
+            .eq("status","waiting");
+
+    if(!waitingError){
+
+        document.getElementById(
+            "waitingCount"
+        ).textContent =
+            waiting || 0;
+    }
+
+    const {
+        count:served,
+        error:servedError
+    } =
+        await supabaseClient
+            .from("queue_tickets")
+            .select("*",{
+                count:"exact",
+                head:true
+            })
+            .eq("status","done");
+
+    if(!servedError){
+
+        document.getElementById(
+            "servedCount"
+        ).textContent =
+            served || 0;
+    }
+}
+
+
+async function refreshDashboard(){
+
+    await Promise.all([
+        loadQueue(),
+        loadCurrentClients(),
+        loadStats(),
+        loadCurrentAppointmentsForChairs()
+    ]);
+
+}
+
+
+async function callNext(chair){
+
+    const button =
+        document.getElementById(
+            `call-button-${chair}`
+        );
+
+    button.disabled=true;
+
+    button.textContent=
+        "Appel en cours...";
+
+    console.log(
+        "POSTE ENVOYÉ :",
+        chair
+    );
+
+    const {data,error} =
+        await supabaseClient
+            .rpc(
+                "call_next_customer",
+                {
+                    p_chair:Number(chair)
+                }
+            );
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Impossible d'appeler le client suivant."
+        );
+
+        button.disabled=false;
+
+        button.textContent=
+            "APPELER LE SUIVANT";
+
+        return;
+    }
+
+    if(!data){
+
+        alert(
+            "Aucun client en attente."
+        );
+
+        button.disabled=false;
+
+        button.textContent=
+            "APPELER LE SUIVANT";
+
+        return;
+    }
+
+    console.log(
+        "Client appelé :",
+        data
+    );
+
+    await refreshDashboard();
+
+}
+
+
+async function finishClient(chair){
+
+    const button =
+        document.getElementById(
+            `finish-button-${chair}`
+        );
+
+    button.disabled=true;
+
+    button.textContent=
+        "Terminer";
+
+    const {data,error} =
+        await supabaseClient
+            .rpc(
+                "finish_customer_by_chair",
+                {
+                    p_chair:Number(chair)
+                }
+            );
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Impossible de terminer le client."
+        );
+
+        button.disabled=false;
+
+        button.textContent=
+            "Terminer";
+
+        return;
+    }
+
+    if(!data){
+
+        alert(
+            "Aucun client en cours au Poste "+
+            chair+
+            "."
+        );
+
+        button.disabled=false;
+
+        button.textContent=
+            "Terminer";
+
+        return;
+    }
+
+    console.log(
+        "Client terminé :",
+        data
+    );
+
+    await refreshDashboard();
+
+}
+
+
+async function refreshConfirmedAppointments(){
+  const host=document.getElementById('confirmedAppointmentsList');if(!host)return;
+  const {data,error}=await supabaseClient.from('queue_appointments').select('id,customer_name,customer_phone,service,barber_name,appointment_at,status,chair').eq('status','confirmed').order('appointment_at',{ascending:true}).limit(100);
+  const escA=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  if(error){host.innerHTML='<div class="appointment-card">Impossible de charger les rendez-vous : '+escA(error.message)+'</div>';return}
+  if(!data||!data.length){host.innerHTML='<div class="appointment-card">Aucun rendez-vous confirmé en attente d’appel.</div>';return}
+  host.innerHTML=data.map(a=>{const d=new Date(a.appointment_at);const phone=String(a.customer_phone||'').replace(/[^0-9+]/g,'');return `<article class="appointment-card"><div class="appt-time">${d.toLocaleString('fr-FR')}</div><div class="appt-name">${escA(a.customer_name)} · ${escA(a.service)}</div><div class="appt-meta">Téléphone : ${escA(a.customer_phone)}<br>Coiffeur : ${escA(a.barber_name||'Non attribué')}<br>Statut : CONFIRMÉ — utilisez le bouton du poste concerné.</div>${phone?`<a class="appt-call" style="display:block;text-align:center;text-decoration:none" href="https://wa.me/${phone.replace(/\D/g,'')}" target="_blank" rel="noopener">CONTACT WHATSAPP</a>`:''}</article>`}).join('');
+}
+async function loadCurrentAppointmentsForChairs(){
+  const {data,error}=await supabaseClient.from('queue_appointments').select('id,customer_name,customer_phone,service,barber_name,appointment_at,status,chair').eq('status','called').order('called_at',{ascending:false}).limit(100);
+  if(error){console.warn('Current appointments unavailable:',error.message);return}
+  for(let chair=1;chair<=adminChairNames.length;chair++){
+    const box=document.getElementById('station-appointment-'+chair);const details=document.getElementById('station-appointment-details-'+chair);const finish=document.getElementById('finish-appointment-button-'+chair);if(!box||!details)continue;
+    const a=(data||[]).find(x=>Number(x.chair)===chair);
+    if(!a){box.style.display='none';details.innerHTML='';if(finish)finish.disabled=true;continue}
+    const escA=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    box.style.display='block';details.innerHTML=`<strong>${escA(a.customer_name)}</strong><br>${escA(a.service)} · ${new Date(a.appointment_at).toLocaleString('fr-FR')}<br><span style="color:#9ca8bd">${escA(a.customer_phone)}</span>`;if(finish)finish.disabled=false;
+  }
+}
+async function callNextAppointment(chair){
+  const button=document.getElementById('call-appointment-button-'+chair);if(button){button.disabled=true;button.textContent='RECHERCHE…'}
+  try{
+    const {data:settingsData,error:settingsError}=await supabaseClient.from('barber_queue_settings').select('config').eq('id',1).maybeSingle();if(settingsError)console.warn(settingsError.message);
+    const postName=String(adminChairNames[Number(chair)-1]||'').trim();const barbers=settingsData?.config?.barbers||[];const barberForPost=String(barbers[Number(chair)-1]?.name||barbers[Number(chair)-1]||'').trim();
+    const {data,error}=await supabaseClient.from('queue_appointments').select('id,customer_name,customer_phone,service,barber_name,appointment_at,status,chair').eq('status','confirmed').order('appointment_at',{ascending:true}).limit(100);
+    if(error)throw error;
+    const match=(data||[]).find(a=>!a.chair&&(!a.barber_name||[postName,barberForPost].some(n=>n&&String(a.barber_name).trim().toLowerCase()===n.toLowerCase())));
+    if(!match){alert('Aucun rendez-vous confirmé attribué à ce poste.');return}
+    await callAppointment(match.id,String(match.customer_phone||'').replace(/[^0-9+]/g,''),Number(chair));
+  }catch(e){alert('Impossible de récupérer le rendez-vous : '+e.message)}finally{if(button){button.disabled=false;button.textContent='APPELER RENDEZ-VOUS'}}
+}
+async function callAppointment(id,phone,chair){
+  const patch={status:'called',called_at:new Date().toISOString(),updated_at:new Date().toISOString()};if(Number.isInteger(Number(chair))&&Number(chair)>0)patch.chair=Number(chair);
+  const {error}=await supabaseClient.from('queue_appointments').update(patch).eq('id',id).eq('status','confirmed');
+  if(error){alert('Impossible de marquer le rendez-vous comme appelé : '+error.message);return}
+  await Promise.all([refreshConfirmedAppointments(),loadCurrentAppointmentsForChairs()]);
+  if(phone&&confirm('Rendez-vous affecté au poste '+(chair||'choisi')+'. Voulez-vous ouvrir WhatsApp pour contacter le client ?'))window.open('https://wa.me/'+phone.replace(/\D/g,''),'_blank','noopener');
+}
+async function finishAppointment(chair){
+ const {error}=await supabaseClient.from('queue_appointments').update({status:'done',updated_at:new Date().toISOString()}).eq('status','called').eq('chair',Number(chair));
+ if(error){alert('Impossible de terminer le rendez-vous : '+error.message);return}
+ await Promise.all([refreshConfirmedAppointments(),loadCurrentAppointmentsForChairs()]);
+}
+
+supabaseClient
+    .channel("admin-queue")
+    .on(
+        "postgres_changes",
+        {
+            event:"*",
+            schema:"public",
+            table:"queue_tickets"
+        },
+        function(payload){
+
+            console.log(
+                "Queue updated:",
+                payload
+            );
+
+            refreshDashboard();
+
+        }
+    )
+    .subscribe(function(status){
+
+        console.log(
+            "Admin Realtime:",
+            status
+        );
+
+    });
+
+
+loadAdminSettings().then(()=>refreshDashboard());
+refreshConfirmedAppointments();
+try{supabaseClient.channel('admin-confirmed-appointments').on('postgres_changes',{event:'*',schema:'public',table:'queue_appointments'},()=>{refreshConfirmedAppointments();loadCurrentAppointmentsForChairs()}).subscribe(status=>console.log('Appointments Realtime:',status))}catch(e){console.warn('Appointment realtime unavailable',e)}
+setInterval(()=>{refreshConfirmedAppointments();loadCurrentAppointmentsForChairs()},5000);
+setInterval(async()=>{const changed=await loadAdminSettings();if(changed)await refreshDashboard();else await refreshDashboard()},5000);
+
+
+
+</script>
+
+</body>
+</html>
